@@ -3,32 +3,47 @@
 /**
  * Module dependencies.
  */
+var fs = require('fs');
 
 var app = require('../app');
 var debug = require('debug')('video-recording-with-webrtc:server');
 var http = require('http');
+var https = require('https');
+
+//creds
+var privateKey  = fs.readFileSync('ssl_certificates/server.key', 'utf8');
+var certificate = fs.readFileSync('ssl_certificates/server.crt', 'utf8');
+var credentials = {key: privateKey, cert: certificate};
 
 /**
  * Get port from environment and store in Express.
  */
 
-var port = normalizePort(process.env.PORT || '3041');
-app.set('port', port);
+var http_port = normalizePort(3001);
+var https_port = normalizePort(3443);
 
 /**
  * Create HTTP server.
  */
+var httpServer = http.createServer(app);
+var httpsServer = https.createServer(credentials, app);
 
-var server = http.createServer(app);
-var io = require('./../io')(server); //add server to websocket
+var http_io = require('./../io')(httpServer); //add server to websocket
+var https_io = require('./../io')(httpsServer); //add server to websocket
 
 /**
  * Listen on provided port, on all network interfaces.
  */
 
-server.listen(port);
-server.on('error', onError);
-server.on('listening', onListening);
+httpServer.listen(http_port);
+httpsServer.listen(https_port);
+
+httpServer.on('error', onHttpError);
+httpServer.on('listening', onHttpListening);
+
+httpsServer.on('error', onHttpsError);
+httpsServer.on('listening', onHttpsListening);
+
 
 /**
  * Normalize a port into a number, string, or false.
@@ -53,8 +68,31 @@ function normalizePort(val) {
 /**
  * Event listener for HTTP server "error" event.
  */
+function onHttpError(error) {
+  if (error.syscall !== 'listen') {
+    throw error;
+  }
 
-function onError(error) {
+  var bind = typeof port === 'string'
+    ? 'Pipe ' + port
+    : 'Port ' + port;
+
+  // handle specific listen errors with friendly messages
+  switch (error.code) {
+    case 'EACCES':
+      console.error(bind + ' requires elevated privileges');
+      process.exit(1);
+      break;
+    case 'EADDRINUSE':
+      console.error(bind + ' is already in use');
+      process.exit(1);
+      break;
+    default:
+      throw error;
+  }
+}
+
+function onHttpsError(error) {
   if (error.syscall !== 'listen') {
     throw error;
   }
@@ -82,8 +120,16 @@ function onError(error) {
  * Event listener for HTTP server "listening" event.
  */
 
-function onListening() {
-  var addr = server.address();
+function onHttpListening() {
+  var addr = httpServer.address();
+  var bind = typeof addr === 'string'
+    ? 'pipe ' + addr
+    : 'port ' + addr.port;
+  debug('Listening on ' + bind);
+}
+
+function onHttpsListening() {
+  var addr = httpsServer.address();
   var bind = typeof addr === 'string'
     ? 'pipe ' + addr
     : 'port ' + addr.port;

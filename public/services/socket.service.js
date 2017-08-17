@@ -9,8 +9,8 @@
     function Service(socketFactory){
 
         var access_urls = {
-            sample_01 : "http://localhost:3041/io/sample_01", 
-            sample_02 : "http://localhost:3041/io/sample_02", 
+            sample_01 : "/io/sample_01", 
+            sample_02 : "/io/sample_02", 
         }
 
         var cached_sockets = {
