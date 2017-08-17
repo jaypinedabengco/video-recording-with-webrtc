@@ -7,6 +7,7 @@
         'ngMaterial',
         'ngRoute',
         'ngMessages',
+        'btford.socket-io', 
       
         //base modules
         'app.service.module', 

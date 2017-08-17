@@ -20,7 +20,7 @@ app.set('port', port);
  */
 
 var server = http.createServer(app);
-var ws = require('./../ws')(server); //add server to websocket
+var io = require('./../io')(server); //add server to websocket
 
 /**
  * Listen on provided port, on all network interfaces.

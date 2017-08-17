@@ -18,7 +18,7 @@
       $locationProvider.hashPrefix('!');
       $routeProvider.        
         when('/', {
-            templateUrl: 'views/home.view.html'
+            template: '<sample></sample>'
         })
         .otherwise('/404');
     }    
