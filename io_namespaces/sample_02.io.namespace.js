@@ -1,11 +1,13 @@
 /**
- * SAMPLE connection io namespace
+ * 
  */
-module.exports = function(io){
+module.exports = function(namespace_name, io){
+    
+    var nsp = io.of(namespace_name);
 
-    io.on('connection', function(client){
+    nsp.on('connection', function(socket){
 
-        client.on('say-hello', onSayHello);
+        socket.on('say-hello', onSayHello);
         
         return initialize();
 
@@ -15,12 +17,12 @@ module.exports = function(io){
             console.log('i connected to sample 02 namespace');
 
             //save on load
-            client.emit('on-connect', 'Welcome to sample 02');
+            socket.emit('on-connect', 'Welcome to sample 02');
         }
 
         function onSayHello(data){
             console.log('the client says hello', data);
-            client.emit('respond-to-hello', 'Hello to you too from sample 02');
+            socket.emit('respond-to-hello', 'Hello to you too from sample 02');
         }
 
     });

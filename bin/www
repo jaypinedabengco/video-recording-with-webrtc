@@ -74,8 +74,8 @@ function onHttpError(error) {
   }
 
   var bind = typeof port === 'string'
-    ? 'Pipe ' + port
-    : 'Port ' + port;
+    ? 'Pipe ' + http_port
+    : 'Port ' + http_port;
 
   // handle specific listen errors with friendly messages
   switch (error.code) {
@@ -97,9 +97,9 @@ function onHttpsError(error) {
     throw error;
   }
 
-  var bind = typeof port === 'string'
-    ? 'Pipe ' + port
-    : 'Port ' + port;
+  var bind = typeof https_port === 'string'
+    ? 'Pipe ' + https_port
+    : 'Port ' + https_port;
 
   // handle specific listen errors with friendly messages
   switch (error.code) {

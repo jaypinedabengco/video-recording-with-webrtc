@@ -11,16 +11,17 @@
         var access_urls = {
             sample_01 : "/io/sample_01", 
             sample_02 : "/io/sample_02", 
-        }
-
-        var cached_sockets = {
-            sample_01 : null, 
-            sample_02 : null
+            signaling_server : '/io/signaling_server',
+            tag_game : '/io/tag_game', 
+            simple_chat : '/io/simple_chat'
         }
 
         var services = {
             getSample01 : getSample01, 
-            getSample02 : getSample02
+            getSample02 : getSample02, 
+            getSignalingServer : getSignalingServer, 
+            getTagGame : getTagGame, 
+            connectToSimpleChat : connectToSimpleChat
         }
         
         return services;
@@ -31,36 +32,49 @@
          * 
          */                    
         function getSample01(){
-
-            //if cached
-            if ( cached_sockets.sample_01 ){
-                return cached_sockets.sample_01;
-            }
-
-            //set connection
-            cached_sockets.sample_01 = socketFactory({
-                ioSocket: io.connect(access_urls.sample_01)
+            return socketFactory({ 
+                ioSocket : io(access_urls.sample_01)
             });
-
-            return cached_sockets.sample_01;
         }
 
         /**
          * 
          */
         function getSample02(){
+            return socketFactory({ 
+                ioSocket : io(access_urls.sample_02)
+            });            
+        }
 
-            //if cached
-            if ( cached_sockets.sample_02 ){
-                return cached_sockets.sample_02;
-            }
-
-            //set connection
-            cached_sockets.sample_02 = socketFactory({
-                ioSocket: io.connect(access_urls.sample_02)
+        /**
+         * 
+         */
+        function getSignalingServer(auth_token){
+            return socketFactory({ 
+                ioSocket : io(access_urls.signaling_server, {
+                    query: 'token=' + auth_token
+                })
             });
+        }
 
-            return cached_sockets.sample_02;
+        /**
+         * 
+         */
+        function getTagGame(){
+            return socketFactory({ 
+                ioSocket : io(access_urls.tag_game)
+            });                
+        }
+
+        /**
+         * 
+         * @param {*} username 
+         * @param {*} password 
+         */
+        function connectToSimpleChat(){
+            return socketFactory({ 
+                ioSocket : io(access_urls.simple_chat)
+            });                            
         }
       
     }

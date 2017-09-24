@@ -18,7 +18,10 @@ app.use(cookieParser());
 /* Routes */
 
 app.use('/', express.static(path.join(__dirname, 'public')));
+app.use('/api', require('./routes/authentication.route'));
 app.use('/api', require('./routes/sample.route'));
+app.use('/api', require('./routes/sample.redis.route'));
+
 
 ////
 

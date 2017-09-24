@@ -16,10 +16,19 @@
 
       //Routing
       $locationProvider.hashPrefix('!');
-      $routeProvider.        
-        when('/', {
-            template: '<sample></sample>'
+      $routeProvider
+        .when('/', {
+          templateUrl : '/views/home.view.html'
         })
+        .when('/simple-chat', {
+          template: '<simple-chat></simple-chat>'
+        })
+        .when('/sample-webrtc', {
+          template: '<webrtc-sample></webrtc-sample>'
+        })
+        .when('/tag-game', {
+          template: '<tag-game></tag-game>'
+        })        
         .otherwise('/404');
     }    
 
