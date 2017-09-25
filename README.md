@@ -2,7 +2,7 @@
 Sample Video Recording using WebRTC
  - will also use AWS Video Transcoding for video processing
 
-* TODO 
+## TODO : ##
   * [SERVER] Create Simple Authentication API (sample data)
     * will return authentication 'token' using JWT
   * [CLIENT] Add authentication page/view and integrate simple authentication
