@@ -122,25 +122,30 @@ function removeRoomsToUser(socket_id){
         .then(rooms => {
     
                 //remove to rooms
-                rooms.forEach(
-                    room_name => {
-                        dao_chat_room.removeUserToRoom(room_name, socket_id);
+                var process_remove_from_rooms = [];
+                var process_unregister_user_from_room = dao_chat_user.unregisterRoomToUser(socket_id); //remove users rooms
+                
+                rooms.forEach(room_name => process_remove_from_rooms.push(dao_chat_room.removeUserToRoom(room_name, socket_id)));
+
+                return Promise.all([
+                    process_remove_from_rooms, 
+                    process_unregister_user_from_room
+                ]).then( () => {
+                    //validate rooms, if has empty, then remove room
+                    rooms.forEach(room_name => {
+                        dao_chat_room
+                            .getAllUsersInRoom(room_name)
+                            .then(users_in_room => {
+                                if (users_in_room.length <= 0){ //if no more users then remove room
+                                    dao_chat_room.deleteRoom(room_name);
+                                    dao_chat_room.removeRoomToList(room_name);
+                                } 
+                            }
+                        );
                     });
-                dao_chat_user.unregisterRoomToUser(socket_id); //remove users rooms
 
-                //validate rooms, if has empty, then remove room
-                rooms.forEach(room_name => {
-
-                    dao_chat_room
-                        .getAllUsersInRoom(room_name)
-                        .then(users_in_room => {
-                            if (users_in_room.length <= 0) //if no more users then remove
-                                dao_chat_room.removeRoomToList(room_name)
-                        });
-
+                    return Promise.resolve(rooms); //return rooms list
                 });
-
-                return rooms;
             }
         )
 }

@@ -22,6 +22,7 @@
 			vm.chat_socket_instance = null;
 			vm.show_fail_create_room_error = false;
 			vm.logged_user_info = null;
+			vm.is_logged_in = false;
 			vm.sign_up_user = {};
 			vm.rooms_list = [];
 			vm.messages_within_the_room = [];
@@ -68,7 +69,6 @@
 			 * @param {*} message 
 			 */
 			function sendMessageToRoom(message){
-				console.log(message);
 				vm.chat_socket_instance.emit('chat.sendMessageToRoom.new', vm.current_room, message);
 			}
 
@@ -130,7 +130,10 @@
 			 */
 			function socketEventOnConnect(data){
 				console.log('signing up user...');
-				vm.chat_socket_instance.emit('chat.register', vm.sign_up_user);
+				if ( !vm.is_logged_in ){
+					vm.chat_socket_instance.emit('chat.register', vm.sign_up_user);
+				}
+
 			}
 
 			/**
@@ -146,6 +149,7 @@
 			 * @param {*} data 
 			 */
 			function socketEventOnRegisterSuccess(user_info){
+				vm.is_logged_in = true;
 				vm.logged_user_info = user_info;				
 			}
 
@@ -179,6 +183,15 @@
 			}
 
 			function socketEventPersonLeftRoom(user_info){
+
+				var user_to_remove_index = vm.users_in_room.indexOf(user_info);
+				var user_to_delete = _.findWhere(vm.users_in_room, {id : user_info.id});
+
+				//remove from list
+				if ( user_to_delete && vm.users_in_room.indexOf(user_to_delete) > -1 ){
+					vm.users_in_room.splice(vm.users_in_room.indexOf(user_to_delete), 1);
+				}
+
 				vm.messages_within_the_room.push({
 					message : user_info.name + ' has LEFT THE ROOM', 
 					event : true,

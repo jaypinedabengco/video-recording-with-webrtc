@@ -28,7 +28,7 @@ module.exports = function(namespace_name, io){
          */
         function initialize(){
             emit_updateRoomsList();
-            console.log('connected');
+            console.log('connected'); 
         }
 
         /**
@@ -38,11 +38,13 @@ module.exports = function(namespace_name, io){
             emitAllOnRoom_personLeftRoom()
                 .then(
                     () => {
-                        console.log('HEY!')
                         //remove all rooms for student
                         service_chat
                             .removeRoomsToUser(socket_id)
-                            .then(() => emitAll_updateRoomsList()); //emit update rooms
+                            .then((rooms_left) => {
+                                console.log('rooms left', rooms_left);
+                                emitAll_updateRoomsList()
+                            }); //emit update rooms
                         service_chat.unregisterUser(socket_id);
                     }
                 )
@@ -139,24 +141,23 @@ module.exports = function(namespace_name, io){
          * @param {*} socket_id 
          */
         function joinRoom(room_name, socket_id){
-
             socket.join(room_name, () => {
-
                 service_chat
                     .getUserBySocketId(socket_id)
                     .then(
                         (user_info) => {
                             socket.broadcast.to(room_name).emit('chat.newPersonOnRoom', user_info)
                             socket.emit('chat.joinRoom.success', room_name);
-                            service_chat.addRoomToUser(socket_id, room_name); //register room to user
-                            
-                            //update users on rooms list
                             service_chat
-                                .getAllUsersInRoom(room_name)
-                                .then( users_in_room => socket.broadcast.to(room_name).emit('chat.updateUsersinRoom', users_in_room));                            
+                                .addRoomToUser(socket_id, room_name)
+                                .then(() => room_name)
+                                .then( service_chat.getAllUsersInRoom ) //update users on rooms list
+                                .then( users_in_room => {
+                                    socket.broadcast.to(room_name).emit('chat.updateUsersinRoom', users_in_room);
+                                    socket.emit('chat.updateUsersinRoom', users_in_room);                                   
+                                });
                         }
                     );
-
             });
         }
 

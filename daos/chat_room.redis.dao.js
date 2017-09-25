@@ -10,6 +10,7 @@ const ROOM_USER = 'chat:room:user:%s';//room_name
 ///
 
 exports.createRoom = createRoom;
+exports.deleteRoom = deleteRoom;
 exports.getRoom = getRoom;
 exports.addToRoomList = addToRoomList;
 exports.removeRoomToList = removeRoomToList;
@@ -29,12 +30,21 @@ exports.removeUserToRoom = removeUserToRoom;
  * @param {*} model 
  */
 function createRoom(model){
-    
     return redis
             .client.hmsetAsync(
                 util.format(ROOM_NAME, model.room_name ), //build room name
                 {creator_socket_id : model.socket_id}
             );
+}
+
+/**
+ * 
+ * @param {*} room_name 
+ */
+function deleteRoom(room_name){
+    return redis
+            .client
+            .delAsync(util.format(ROOM_NAME, room_name));
 }
 
 /**
