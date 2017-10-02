@@ -23,8 +23,8 @@
         .when('/simple-chat', {
           template: '<simple-chat></simple-chat>'
         })
-        .when('/sample-webrtc', {
-          template: '<webrtc-sample></webrtc-sample>'
+        .when('/simple-webrtc', {
+          template: '<simple-webrtc></simple-webrtc>'
         })
         .when('/tag-game', {
           template: '<tag-game></tag-game>'

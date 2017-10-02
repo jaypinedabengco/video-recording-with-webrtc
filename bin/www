@@ -4,6 +4,7 @@
  * Module dependencies.
  */
 var fs = require('fs');
+var config = require('./../configuration');
 
 var app = require('../app');
 var debug = require('debug')('video-recording-with-webrtc:server');
@@ -19,8 +20,8 @@ var credentials = {key: privateKey, cert: certificate};
  * Get port from environment and store in Express.
  */
 
-var http_port = normalizePort(3001);
-var https_port = normalizePort(3443);
+var http_port = normalizePort(config.http_port);
+var https_port = normalizePort(config.https_port);
 
 /**
  * Create HTTP server.
@@ -35,8 +36,8 @@ var https_io = require('./../io')(httpsServer); //add server to websocket
  * Listen on provided port, on all network interfaces.
  */
 
-httpServer.listen(http_port);
-httpsServer.listen(https_port);
+httpServer.listen(process.env.HTTP_PORT || http_port);
+httpsServer.listen(process.env.HTTPS_PORT || https_port);
 
 httpServer.on('error', onHttpError);
 httpServer.on('listening', onHttpListening);
