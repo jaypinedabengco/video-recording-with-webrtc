@@ -52,7 +52,7 @@
         function getSignalingServer(auth_token){
             return socketFactory({ 
                 ioSocket : io(access_urls.signaling_server, {
-                    query: 'token=' + auth_token
+                    query: 'auth_token=' + auth_token
                 })
             });
         }

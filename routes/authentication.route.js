@@ -2,10 +2,11 @@ var express = require('express'),
     jwt = require('jsonwebtoken');
 
 var config = require('./../configuration');
-
+var authentication_service = require('./../services/authenticate.service');
 var router = express.Router();
 
 const EXPIRES_IN_MINUTES = (60 * 60); //(Seconds * N) 60 minutes
+
 
 //////
 
@@ -31,19 +32,22 @@ function authenticate(req, res, next){
         });
     }
 
-    //build sample info
-    var user_info = {
-        id : "random-id-" + (Math.ceil(Math.random() * 10000)),
-        username : auth_info.username
-    }
-
-    var auth_token = jwt.sign(user_info, config.jwt_secret_key, { expiresIn : EXPIRES_IN_MINUTES});
-
-    return res.status(200).json({
-        success : true, 
-        message : "Logged in successfully", 
-        data : auth_token
-    });
+    authentication_service
+        .authenticate(auth_info.username, auth_info.password)
+        .then(
+            (user_info) => {
+                var auth_token = jwt.sign(user_info, config.jwt_secret_key, { expiresIn : EXPIRES_IN_MINUTES});
+                return res.status(200).json({
+                    success : true, 
+                    message : "Logged in successfully", 
+                    data : auth_token
+                });
+            }        
+        ).catch(err => res.status(400).json({
+            success : false, 
+            message : err
+        })
+    );
 }
 
 module.exports = router;

@@ -10,11 +10,15 @@
 		/////
 
 		ComponentController.$inject = [
-			'$scope', 'app.socket.service'		
+			'$q', '$scope', 
+			'app.socket.service', 'app.webrtc.service', 
+			'app.dataservice.authentication'		
 		];
 
 		function ComponentController(
-			$scope, socketService
+			$q, $scope, 
+			socketService, webrtcService, 
+			authenticationDataservice
 		) {
 
 			var vm = this;
@@ -24,40 +28,38 @@
 
 			vm.logged_in_username;	
 			vm.target_username;
+			vm.is_caller = false;
+			vm.is_recording = false;
+			
+			vm.io_signaling_server;		
+			vm.local_video; 
+			vm.remote_video;				
 			vm.webrtc_connection;
 			vm.webrtc_datachannel;
 			vm.webrtc_local_video;
 			vm.webrtc_remote_video;
-			vm.webrtc_stream;
-
-			vm.local_video; 
-			vm.remote_video;
+			vm.webrtc_local_stream;
+			vm.webrtc_remote_stream;
+			vm.webrtc_media_recorder;
+			vm.recorded_video_chunks = [];
+			vm.recorded_videos_list = [];
 
 			vm.CONFIG_WEBRTC = { 
-				"iceServers": [{ "url": "stun:stun.1.google.com:19302" }] 
+				"iceServers": [{'url': 'stun:stun.services.mozilla.com'}, {'url': 'stun:stun.l.google.com:19302'}]				
 			};
 
 			//functions
+			vm.connectToSignalingServer = connectToSignalingServer;
 			vm.hasUserMedia = hasUserMedia;
 			vm.getUserMedia = getUserMedia;
 			vm.login = login;
 			vm.connectTo = connectTo;
 			vm.hangup = hangup;
+			vm.toggleRecording = toggleRecording;
 			vm.io_sendMessageToTarget = io_sendMessageToTarget;
 			vm.handleLeave = handleLeave;
 
 			//socket events
-			vm.io_signaling_server = socketService.getSignalingServer();
-			vm.io_signaling_server.on('connect', io_onConnect);			
-			vm.io_signaling_server.on('disconnect', io_onDisconnect);			
-			vm.io_signaling_server.on('login.success', io_onLoginSuccess);
-			vm.io_signaling_server.on('login.error', io_onLoginError);
-			vm.io_signaling_server.on('offer.success', io_onOfferSuccess);
-			vm.io_signaling_server.on('offer.error', io_onOfferError);
-			vm.io_signaling_server.on('incoming.offer', io_incomingOffer);
-			vm.io_signaling_server.on('incoming.answer', io_incomingAnswer);
-			vm.io_signaling_server.on('incoming.candidate', io_incomingCandidate);
-			vm.io_signaling_server.on('available_users_for_call.update', io_updateUserToCallList);
 
 			//on load
 			vm.$onInit = activate;
@@ -67,6 +69,30 @@
 			////
 
 			function activate(){			
+			}
+
+			/**
+			 * 
+			 * @param {*} token 
+			 */
+			function connectToSignalingServer(token){
+				return $q(function(resolve, reject) {
+					vm.io_signaling_server = socketService.getSignalingServer(token);
+					vm.io_signaling_server.on('connect', io_onConnect);		
+					vm.io_signaling_server.on('disconnect', io_onDisconnect);								
+					vm.io_signaling_server.on('connect_failed', io_onConnectFailed);
+					vm.io_signaling_server.on('login.success', io_onLoginSuccess);
+					vm.io_signaling_server.on('login.error', io_onLoginError);
+					vm.io_signaling_server.on('offer.success', io_onOfferSuccess);
+					vm.io_signaling_server.on('offer.error', io_onOfferError);
+					vm.io_signaling_server.on('incoming.offer', io_incomingOffer);
+					vm.io_signaling_server.on('incoming.answer', io_incomingAnswer);
+					vm.io_signaling_server.on('incoming.candidate', io_incomingCandidate);
+					vm.io_signaling_server.on('incoming.onleave', io_incomingOnLeave);
+					vm.io_signaling_server.on('available_users_for_call.update', io_updateUserToCallList);
+
+					resolve(vm.io_signaling_server);//end
+				});					
 			}
 			
 			/**
@@ -92,8 +118,19 @@
 			  * 
 			  * @param {*} login_username 
 			  */
-			 function login(login_username){
-				vm.io_signaling_server.emit('login', {username : login_username});
+			 function login(login_username, password){
+
+				authenticationDataservice
+					.login(login_username, password)
+					.then(function(auth_token){
+						vm.connectToSignalingServer(auth_token);
+					})
+					.catch(function(err){
+						console.log(err);
+						alert(err.message);
+					});
+
+				// vm.io_signaling_server.emit('login', {username : login_username});
 			 }
 
 			 /**
@@ -119,8 +156,9 @@
 			  * 
 			  */
 			 function hangup(){
-				vm.io_sendMessageToTarget(vm.target_username, 'offer', {});					
+				vm.io_sendMessageToTarget(vm.target_username, 'leave', {});					
 				vm.handleLeave();
+				vm.logged_in_username = null;
 			 }
 
 			 /**
@@ -135,12 +173,88 @@
 				vm.webrtc_connection.onaddstream = null; 
 			 }	
 
+			 /**
+			  * 
+			  */
+			 function toggleRecording(){
+				//should be the caller
+				if ( vm.is_caller ){
+					//either stop or start recording...
+					vm.is_recording ? stopRecording() : startRecording();
+				}
+			 }
+
+			 /**
+			  * 
+			  */
+			 function startRecording(){
+				if ( !vm.is_recording ){
+					vm.is_recording = true;
+
+					vm.webrtc_media_recorder = webrtcService.getMediaRecorder(vm.webrtc_remote_stream);
+					vm.webrtc_media_recorder.start(1000 * 1); //every second?
+
+					//register chunks when available
+					vm.webrtc_media_recorder.ondataavailable = function(e){
+						console.log('i got the video!', e);
+						vm.recorded_video_chunks.push(e.data);
+					}
+
+					//on error
+					vm.webrtc_media_recorder.onerror = function(e){
+						console.log('Error: ' + e);
+						console.log('Error: ', e);
+					};
+
+					//on start
+					vm.webrtc_media_recorder.onstart = function(){
+						console.log('Started & state = ' + vm.webrtc_media_recorder.state);
+					};
+
+					//on stop
+					vm.webrtc_media_recorder.onstop = function(){
+						console.log('Stopped  & state = ' + vm.webrtc_media_recorder.state);
+				
+						console.log(vm.recorded_video_chunks);
+						var blob = new Blob(vm.recorded_video_chunks, {type: "video/webm"});
+						vm.recorded_video_chunks = [];
+				
+						console.log('blob', blob);
+						var videoURL = window.URL.createObjectURL(blob);
+						console.log('videoURL', videoURL);
+						vm.recorded_videos_list.push(videoURL);
+						console.log(vm.recorded_videos_list);
+						$scope.$digest(); //to apply updated list
+
+					};
+
+				}
+			 }
+
+			 /**
+			  * 
+			  */
+			 function stopRecording(){
+				if ( vm.is_recording ){
+					vm.is_recording = false;
+					vm.webrtc_media_recorder.stop(); //trigger stop
+				}
+			 }
+
 			/**
 			 * 
 			 * @param {*} message 
 			 */
 			function io_onConnect(message){
 				console.log('connected', message);
+			}
+
+			/**
+			 * 
+			 * @param {*} message 
+			 */
+			function io_onConnectFailed(message){
+				alert(message);
 			}
 
 			/**
@@ -164,15 +278,15 @@
 				//********************** 
 				//Starting a peer connection 
 				//********************** 		
-				navigator.webkitGetUserMedia({video:true, audio:true}, function(stream){
+				webrtcService.getUserMedia({video:true, audio:true}, function(stream){
 
-					vm.stream = stream; //set global stream
+					vm.webrtc_local_stream = stream; //set global stream
 
 					//initialize dom elements
 					vm.local_video = document.querySelector('#localVideo'); 
 					vm.remote_video = document.querySelector('#remoteVideo');
 
-					navigator.webkitGetUserMedia({video:true, audio:false}, function(for_view_stream){
+					webrtcService.getUserMedia({video:true, audio:false}, function(for_view_stream){
 						vm.local_video.src = window.URL.createObjectURL(for_view_stream);					
 					}, function(){});
 
@@ -183,7 +297,8 @@
 				
          			//when a remote user adds stream to the peer connection, we display it 
 					vm.webrtc_connection.onaddstream = function(e){
-						vm.remote_video.src = window.URL.createObjectURL(e.stream);
+						vm.webrtc_remote_stream = e.stream;
+						vm.remote_video.src = window.URL.createObjectURL(vm.webrtc_remote_stream);
 					}
 
 					//setup ice handling
@@ -206,7 +321,8 @@
 			 * 
 			 * @param {*} message 
 			 */
-			function io_onLoginError(message){
+			function io_onLoginError(error){
+				console.log('error', error);
 				alert("Ooops...try a different username"); 
 			}
 
@@ -216,6 +332,7 @@
 			 */
 			function io_onOfferSuccess(data){
 				console.log('offer success', data);
+				vm.is_caller = true;
 				vm.target_username = data.target_username;
 			}
 
@@ -263,6 +380,15 @@
 				console.log('io_incomingCandidate', candidate); 
 				vm.webrtc_connection.addIceCandidate(new RTCIceCandidate(candidate));
 			}	
+
+			/**
+			 * 
+			 * @param {*} left 
+			 */
+			function io_incomingOnLeave(left){
+				console.log('io_incomingOnLeave', left);
+				vm.handleLeave();
+			}
 
 			/**
 			 * 

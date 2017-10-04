@@ -36,8 +36,8 @@ var https_io = require('./../io')(httpsServer); //add server to websocket
  * Listen on provided port, on all network interfaces.
  */
 
-httpServer.listen(process.env.HTTP_PORT || http_port);
-httpsServer.listen(process.env.HTTPS_PORT || https_port);
+httpServer.listen(http_port);
+httpsServer.listen(https_port);
 
 httpServer.on('error', onHttpError);
 httpServer.on('listening', onHttpListening);

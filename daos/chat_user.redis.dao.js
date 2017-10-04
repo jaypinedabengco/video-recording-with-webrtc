@@ -67,8 +67,7 @@ function registerRoomToUser(model){
         .client
         .zaddAsync(
             util.format(ROOM_USER, model.socket_id), 
-            [Date.now(), model.room_name
-        ]);
+            [Date.now(), model.room_name]);
 }
 
 /**

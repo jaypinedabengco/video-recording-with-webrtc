@@ -38,10 +38,10 @@ module.exports = function(server){
     //initialize namespaces
     io.adapter(redis_adapter({ host: conf.redis.host, port: conf.redis.port }));    
 
-    require('./io_namespaces/sample_01.io.namespace')('/io/sample_01', io);
-    require('./io_namespaces/sample_02.io.namespace')('/io/sample_02', io);
+    // require('./io_namespaces/sample_01.io.namespace')('/io/sample_01', io);
+    // require('./io_namespaces/sample_02.io.namespace')('/io/sample_02', io);
     require('./io_namespaces/sample_webrtc_signal_server.io.namespace')('/io/signaling_server', io);
-    require('./io_namespaces/tag_game.io.namespace')('/io/tag_game', io);
+    // require('./io_namespaces/tag_game.io.namespace')('/io/tag_game', io);
     require('./io_namespaces/simple_chat.namespace')('/io/simple_chat', io);
      
     return io;

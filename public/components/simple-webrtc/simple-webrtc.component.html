@@ -1,11 +1,25 @@
+<div ng-show="$ctrl.recorded_videos_list.length">
+    <h1>Recorded Videos</h1>
+    <div ng-repeat="recorded_video_url in $ctrl.recorded_videos_list">
+        <video width="320" height="240" controls ng-src="{{recorded_video_url}}"></video>
+    </div>
+</div>
+
 <div id="loginPage" class="container text-center" ng-hide="$ctrl.logged_in_username">
 
     <div class="row">
         <div class="col-md-4 col-md-offset-4">
 
             <h2>WebRTC Video Demo. Please sign in</h2>
-            <input ng-model="username">
-            <button id="loginBtn" class="btn btn-lg btn-primary btnblock" ng-click="$ctrl.login(username)">Sign in</button>
+            <div>
+                Username : <input ng-model="username">
+            </div>
+            <div>
+                Password : <input type="password" ng-model="password">
+            </div>
+            <div>
+                <button id="loginBtn" class="btn btn-lg btn-primary btnblock" ng-click="$ctrl.login(username, password)">Sign in</button>
+            </div>
         </div>
     </div>
 
@@ -18,7 +32,10 @@
 
     <div class="row text-center">
         <h3 ng-show="$ctrl.logged_in_username">Username : {{$ctrl.logged_in_username}}</h3>
-        <h3 ng-show="$ctrl.target_username">User on other line : {{$ctrl.target_username}}</h3>        
+        <h3 ng-show="$ctrl.target_username">
+            <div>User on other line : {{$ctrl.target_username}}</div>
+            <div>You are the {{$ctrl.is_caller ? 'Caller' : 'Callee'}}
+        </h3>        
         <div class="col-md-12">
             <ul ng-hide="$ctrl.target_username">
                 <li ng-repeat="username in $ctrl.users_list" ng-hide="username == $ctrl.logged_in_username">
@@ -26,28 +43,14 @@
                 </li>
             </ul>
             
+            <button 
+                ng-show="$ctrl.target_username && $ctrl.is_caller" 
+                ng-click="$ctrl.toggleRecording()" 
+                class="btn-warning btn">
+                {{$ctrl.is_recording ? 'Stop Recording' : 'Record'}}
+            </button>            
             <button ng-show="$ctrl.target_username" ng-click="$ctrl.hangup()" class="btn-danger btn">Hang Up</button>
         </div>
     </div>
 
 </div>
-
-<!-- <div>
-    <h4 ng-show="$ctrl.logged_in_username">Hi {{$ctrl.logged_in_username}}</h4>
-    <h4 ng-show="$ctrl.target_username">Meet {{$ctrl.target_username}}</h4>
-</div> -->
-
-<!-- <div ng-hide="$ctrl.logged_in_username">
-    <input type="text" ng-model="username" required/>
-    <button ng-click="$ctrl.login(username)">Login</button>
-</div>
-
-<div ng-hide="$ctrl.target_username || !$ctrl.logged_in_username">
-    <input type="text" ng-model="target_username" required/>
-    <button ng-click="$ctrl.connectTo(target_username)">Establish connection</button>
-</div>
-
-<div ng-show="$ctrl.target_username">
-    <input type="text" ng-model="text_message" required/>
-    <button ng-click="$ctrl.sendTextMessage(text_message)">Send text message</button>
-</div> -->

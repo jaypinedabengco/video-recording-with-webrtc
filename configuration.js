@@ -1,14 +1,14 @@
 /*
 Sample Configuration file
 */
-const CONF = {
-    http_port : 8081, 
-    https_port : 8444,
-    jwt_secret_key : 'ABCD123', 
+const CONFIGURATION = {
+    http_port : process.env.HTTP_PORT || 8081, 
+    https_port : process.env.HTTPS_PORT || 8444,
+    jwt_secret_key : process.env.JWT_SECRET_KEY || 'ABCD123', 
     redis : {
-        host : '127.0.0.1', 
-        port : 16379
+        host : process.env.REDIS_HOST || '127.0.0.1', 
+        port : process.env.REDIS_PORT || 16379
     }
 };
 
-module.exports = CONF;
+module.exports = CONFIGURATION;

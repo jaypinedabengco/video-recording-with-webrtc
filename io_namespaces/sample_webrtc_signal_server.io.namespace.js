@@ -1,4 +1,5 @@
-var simple_webrtc_user_service = require('./../services/simple_webrtc.user.service');
+var simple_webrtc_user_service = require('./../services/simple_webrtc.user.service'), 
+    authenticate_service = require('./../services/authenticate.service');
 
 /**
  * 
@@ -7,14 +8,41 @@ module.exports = function(namespace_name, io){
     
     var nsp = io.of(namespace_name); //initialize namespace
     
-    nsp.on('connection', function(socket){
+    //middleware
+    nsp.use(authenticate);
 
+    nsp.on('connection', onConnect);
+
+    function authenticate(socket, next){
+        var auth_token = socket.handshake.query.auth_token;
+        console.log('auth_token', auth_token);
+        if ( !auth_token ){
+            console.error('CONNECT_FAILED', 'No Auth token');
+            return socket.emit('connect_failed', 'No Auth token');
+        }
+
+        authenticate_service
+            .verifyAndDecodeToken(auth_token)
+            .then(
+                (logged_user_info) => {
+                    socket.logged_user_info = logged_user_info;
+                    next(); //move next if successful
+                }
+            ).catch(err => console.error('CONNECT_FAILED', err));
+    }
+    /**
+     * 
+     * @param {*} socket 
+     */
+    function onConnect(socket){
+        
         //variables;
         var socket_id = socket.id;
+
+        console.log('logged_user_info', socket.logged_user_info);
         
         //events
         socket.on('disconnect', onDisconnect);
-        socket.on('login', onLogin); 
         socket.on('offer', onOffer);
         socket.on('answer', onAnswer);
         socket.on('candidate', onCandidate);
@@ -26,29 +54,19 @@ module.exports = function(namespace_name, io){
 
         /**
          * 
-         * @param {*} username 
          */
-        function onLogin(data){
-
-            var username = data.username;
-            console.log("User logged:", username);    
-
-            if ( !username ){
-                return socket.emit('login.error', 'username is required');
-            }
-
-            //do login
+        function onConnect(){
             simple_webrtc_user_service
-                .setUser(username, socket.id)
+                .setUser(socket.logged_user_info.username, socket.logged_user_info, socket.id)
                 .then(
                     message => { 
-                        socket.emit('login.success', {username : username});
-                        socket.username = username; //add username on socket cache
+                        socket.emit('login.success', {username : socket.logged_user_info.username});
+                        socket.username = socket.logged_user_info.username; //add username on socket cache
                         emit_updateUsersOnList();
                     },
                     error => socket.emit('login.error', error)
                 )
-        }
+        }        
         
         /**
          * 
@@ -58,9 +76,6 @@ module.exports = function(namespace_name, io){
 
             var target_username = data.target_username;
             var offer = data.offer;
-
-            console.log("Sending offer to: ", target_username, offer); 
-
             var caller_username = socket.username;
 
             //offer to target
@@ -70,7 +85,6 @@ module.exports = function(namespace_name, io){
                 offer : offer
             }).then(
                 target_user => {
-                    console.log('hey!');
                     socket.target_username = target_username; //add target_username to socket cache
                     socket.emit('offer.success', {target_username : target_username}); //send to self          
                 }, 
@@ -88,9 +102,6 @@ module.exports = function(namespace_name, io){
             
             var target_username = data.target_username;
             var answer = data.answer;
-
-            console.log("Sending answer to: ", target_username);  
-
             sendToTargetUser(target_username, 'incoming.answer', answer)
                 .then(
                     target_user => {
@@ -109,9 +120,6 @@ module.exports = function(namespace_name, io){
         function onCandidate(data){
             var target_username = data.target_username;
             var candidate = data.candidate;
-
-            console.log("Sending candidate to:", target_username); 
-
             sendToTargetUser(target_username, 'incoming.candidate', candidate)
                 .then(
                     target_user => {
@@ -131,43 +139,27 @@ module.exports = function(namespace_name, io){
             console.log("Disconnecting from", target_username); 
             socket.target_username = null;
 
-            simple_webrtc_user_service
-                .getUser(target_username)
-                .then(
-                    target_user => {
-                        socket.emit('onleave.success', true); //send to self
-                        io.broadcast.to(target_user.socket_id).emit('incoming.onleave', 'left'); //send to target
-                    }, 
-                    error => socket.emit('onleave.error', error)
-                )             
-            
+            sendToTargetUser(target_username, 'incoming.onleave', 'left')
+                .then(target_user =>  socket.emit('onleave.success', true), //send to self
+                    error => socket.emit('answer.error', error))
+                .then(simple_webrtc_user_service.deleteUser(socket.username))
+                .then(emit_updateUsersOnList());
         }
 
         /**
          * 
          */
-        function onConnect(){
-            console.log('connected');
-            socket.emit("Hello from server");             
-        }
+        function onDisconnect(){ 
 
-        /**
-         * 
-         */
-        function onDisconnect(){
-
-            console.log('socket username on disconnect', socket.username);
             if ( socket.username ){//delete on users list
                 simple_webrtc_user_service
                     .deleteUser(socket.username);
-            
                 var target_username = socket.target_username;
                 if ( target_username ){ //notify target username that you have been disconnected
-                    console.log("Disconnecting from ", target_username);                     
                     simple_webrtc_user_service
                         .getUser(target_username)
                         .then(
-                            target_user => io.broadcast.to(target_user.socket_id).emit('incoming.onleave', 'disconnected') //send to target
+                            target_user => target_user ? io.broadcast.to(target_user.socket_id).emit('incoming.onleave', 'disconnected') : '' //send to target
                         )  
                 }                    
             }
@@ -195,11 +187,9 @@ module.exports = function(namespace_name, io){
         function emit_updateUsersOnList(){
             return simple_webrtc_user_service
                 .getAllUsernames()
-                .then(
-                    usernames => nsp.emit('available_users_for_call.update', usernames)
-                )
+                .then(usernames => nsp.emit('available_users_for_call.update', usernames))
         }
         
-    });
+    }    
 
 }

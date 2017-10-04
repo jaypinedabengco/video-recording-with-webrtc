@@ -1,5 +1,4 @@
-var _u = require('underscore');
-var users = [];
+var webrtc_user_dao = require('./../daos/simple_webrtc_users.redis.dao');
 
 exports.getUser = getUser;
 exports.setUser = setUser;
@@ -13,12 +12,7 @@ exports.getAllUsernames = getAllUsernames;
  * @param {*} username 
  */
 function getUser(username){
-    return new Promise((resolve, reject) => {
-        if ( !users[username] ){
-            return reject('User not found');
-        }
-        return resolve(users[username]);
-    });
+    return webrtc_user_dao.getUser(username);
 }
 
 /**
@@ -26,17 +20,10 @@ function getUser(username){
  * @param {*} username 
  * @param {*} socket_id 
  */
-function setUser(username, socket_id){
-    return new Promise((resolve, reject) => {
-        if ( users[username] ){
-            return reject('User already exists');
-        }
-        users[username] = {
-            username : username, 
-            socket_id : socket_id
-        };
-        return resolve("successfully set socket id");
-    });    
+function setUser(username, user_info, socket_id){
+    //add user info
+    user_info.socket_id = socket_id;
+    return webrtc_user_dao.addUser(username, user_info);
 }
 
 /**
@@ -44,12 +31,7 @@ function setUser(username, socket_id){
  * @param {*} username 
  */
 function deleteUser(username){
-    return new Promise((resolve, reject) => {
-        if ( users[username] ){
-            delete users[username];
-        }
-        return resolve("successfully deleted socket id");
-    });        
+    return webrtc_user_dao.deleteUser(username);
 }
 
 /**
@@ -57,8 +39,5 @@ function deleteUser(username){
  * @param {*} logged_username 
  */
 function getAllUsernames(logged_username){
-    return new Promise((resolve, reject) => {
-        return resolve( _u.keys(users));
-    });            
-    
+    return webrtc_user_dao.getAllUsers();         
 }
