@@ -16,8 +16,8 @@ function clearRedisAndInitializeUsers(){
         .then(
             () => {
                 /* Save Demo Users */
-                redis.client.set('user1', 'p');    
-                redis.client.set('user2', 'p');
+                redis.client.set('user1', '1');    
+                redis.client.set('user2', '2');
             }
         )
 }

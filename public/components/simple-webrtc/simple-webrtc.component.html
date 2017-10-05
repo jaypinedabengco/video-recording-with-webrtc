@@ -44,12 +44,12 @@
             </ul>
             
             <button 
-                ng-show="$ctrl.target_username && $ctrl.is_caller" 
+                ng-show="$ctrl.target_username" 
                 ng-click="$ctrl.toggleRecording()" 
                 class="btn-warning btn">
                 {{$ctrl.is_recording ? 'Stop Recording' : 'Record'}}
             </button>            
-            <button ng-show="$ctrl.target_username" ng-click="$ctrl.hangup()" class="btn-danger btn">Hang Up</button>
+            <button ng-show="$ctrl.target_username && !$ctrl.is_recording" ng-click="$ctrl.hangup()" class="btn-danger btn">Hang Up</button>
         </div>
     </div>
 

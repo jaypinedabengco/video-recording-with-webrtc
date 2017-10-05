@@ -1,3 +1,7 @@
+var fs = require('fs');
+
+const RECORDED_VIDEOS_LOCATION = __basedir + '/tmp_recorded_videos/';
+
 var simple_webrtc_user_service = require('./../services/simple_webrtc.user.service'), 
     authenticate_service = require('./../services/authenticate.service');
 
@@ -38,6 +42,7 @@ module.exports = function(namespace_name, io){
         
         //variables;
         var socket_id = socket.id;
+        var ongoing_video_recording_stream = null;
 
         console.log('logged_user_info', socket.logged_user_info);
         
@@ -47,6 +52,9 @@ module.exports = function(namespace_name, io){
         socket.on('answer', onAnswer);
         socket.on('candidate', onCandidate);
         socket.on('leave', onLeave);
+        socket.on('startRecording', onStartRecording);
+        socket.on('recordVideoChunks', onRecordVideoChunks);
+        socket.on('stopRecording', onStopRecording);
         
         return onConnect();
 
@@ -67,6 +75,57 @@ module.exports = function(namespace_name, io){
                     error => socket.emit('login.error', error)
                 )
         }        
+
+        /**
+         * 
+         * @param {*} message 
+         */
+        function onStartRecording(message){
+            if ( ongoing_video_recording_stream ){
+                return socket.emit('recording.error', 'there is an ongoing recording');
+            }
+
+            //initialize video recording stream
+
+            //create temporary video location
+            if ( !fs.existsSync(RECORDED_VIDEOS_LOCATION) ){
+                fs.mkdirSync(RECORDED_VIDEOS_LOCATION);
+            }
+
+            ongoing_video_recording_stream = fs.createWriteStream(RECORDED_VIDEOS_LOCATION + 'sample-' + (new Date().getTime()) + '.webm');
+
+            ongoing_video_recording_stream.on('error', error => {
+                console.log('hey!, error', error)
+            });
+
+            //setup on end
+            ongoing_video_recording_stream.on('finish', data => {
+                console.log('hey! the stream ended', data);
+            });
+            
+            console.log('onStartRecording', message);
+        }
+
+        /**
+         * 
+         * @param {*} video_chunks 
+         */
+        function onRecordVideoChunks(video_chunks){
+            console.log('onRecordVideoChunks', video_chunks);      
+            ongoing_video_recording_stream.write(video_chunks);      
+        }
+
+        /**
+         * 
+         * @param {*} message 
+         */
+        function onStopRecording(message){
+            console.log('stopRecording', message);   
+            setTimeout(function () {
+                ongoing_video_recording_stream.end();
+                ongoing_video_recording_stream = null;
+            }, 1000);                     
+        }
         
         /**
          * 
@@ -163,6 +222,15 @@ module.exports = function(namespace_name, io){
                         )  
                 }                    
             }
+
+            //end recording
+            if ( ongoing_video_recording_stream ){
+                setTimeout(function () {
+                    ongoing_video_recording_stream.end();
+                    ongoing_video_recording_stream = null;
+                }, 1000);   
+            }
+            
         }
 
         /**

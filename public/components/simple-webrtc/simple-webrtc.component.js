@@ -38,7 +38,8 @@
 			vm.webrtc_datachannel;
 			vm.webrtc_local_video;
 			vm.webrtc_remote_video;
-			vm.webrtc_local_stream;
+			vm.webrtc_local_audio_only_stream;
+			vm.webrtc_mixed_stream;
 			vm.webrtc_remote_stream;
 			vm.webrtc_media_recorder;
 			vm.recorded_video_chunks = [];
@@ -50,8 +51,6 @@
 
 			//functions
 			vm.connectToSignalingServer = connectToSignalingServer;
-			vm.hasUserMedia = hasUserMedia;
-			vm.getUserMedia = getUserMedia;
 			vm.login = login;
 			vm.connectTo = connectTo;
 			vm.hangup = hangup;
@@ -94,25 +93,6 @@
 					resolve(vm.io_signaling_server);//end
 				});					
 			}
-			
-			/**
-			 * 
-			 */
-			function hasUserMedia() { 
-				navigator.getUserMedia = navigator.getUserMedia || navigator.webkitGetUserMedia 
-				   || navigator.mozGetUserMedia || navigator.msGetUserMedia; 
-				return !!navigator.getUserMedia; 
-			 }		
-			 
-			 /**
-			  * 
-			  */
-			 function getUserMedia() {
-				navigator.getUserMedia = navigator.getUserMedia || navigator.webkitGetUserMedia
-				|| navigator.mozGetUserMedia || navigator.msGetUserMedia;
-
-				return navigator.getUserMedia;
-			 }
 
 			 /**
 			  * 
@@ -178,10 +158,10 @@
 			  */
 			 function toggleRecording(){
 				//should be the caller
-				if ( vm.is_caller ){
+				// if ( vm.is_caller ){
 					//either stop or start recording...
 					vm.is_recording ? stopRecording() : startRecording();
-				}
+				// }
 			 }
 
 			 /**
@@ -191,13 +171,19 @@
 				if ( !vm.is_recording ){
 					vm.is_recording = true;
 
-					vm.webrtc_media_recorder = webrtcService.getMediaRecorder(vm.webrtc_remote_stream);
+					vm.io_signaling_server.emit('startRecording');
+
+					console.log('vm.webrtc_remote_stream', vm.webrtc_mixed_stream);
+					// console.log('vm.webrtc_mixed_stream', vm.webrtc_mixed_stream);
+
+					vm.webrtc_media_recorder = webrtcService.getMediaRecorder(vm.webrtc_mixed_stream);
 					vm.webrtc_media_recorder.start(1000 * 1); //every second?
 
 					//register chunks when available
 					vm.webrtc_media_recorder.ondataavailable = function(e){
 						console.log('i got the video!', e);
-						vm.recorded_video_chunks.push(e.data);
+						vm.io_signaling_server.emit('recordVideoChunks', e.data);
+						// vm.recorded_video_chunks.push(e.data);
 					}
 
 					//on error
@@ -214,17 +200,13 @@
 					//on stop
 					vm.webrtc_media_recorder.onstop = function(){
 						console.log('Stopped  & state = ' + vm.webrtc_media_recorder.state);
-				
-						console.log(vm.recorded_video_chunks);
-						var blob = new Blob(vm.recorded_video_chunks, {type: "video/webm"});
-						vm.recorded_video_chunks = [];
-				
-						console.log('blob', blob);
-						var videoURL = window.URL.createObjectURL(blob);
-						console.log('videoURL', videoURL);
-						vm.recorded_videos_list.push(videoURL);
-						console.log(vm.recorded_videos_list);
-						$scope.$digest(); //to apply updated list
+						vm.io_signaling_server.emit('stopRecording');
+						
+						// var blob = new Blob(vm.recorded_video_chunks, {type: "video/webm"});
+						// vm.recorded_video_chunks = [];
+						// var videoURL = window.URL.createObjectURL(blob);
+						// vm.recorded_videos_list.push(videoURL);
+						// $scope.$digest(); //to apply updated list
 
 					};
 
@@ -280,14 +262,20 @@
 				//********************** 		
 				webrtcService.getUserMedia({video:true, audio:true}, function(stream){
 
-					vm.webrtc_local_stream = stream; //set global stream
+					// vm.webrtc_local_stream = stream; //set global stream
 
 					//initialize dom elements
 					vm.local_video = document.querySelector('#localVideo'); 
 					vm.remote_video = document.querySelector('#remoteVideo');
 
+					//VIDEO ONLY
 					webrtcService.getUserMedia({video:true, audio:false}, function(for_view_stream){
 						vm.local_video.src = window.URL.createObjectURL(for_view_stream);					
+					}, function(){});
+
+					//LOCAL AUDIO
+					webrtcService.getUserMedia({video:false, audio:true}, function(for_audio_stream){
+						vm.webrtc_local_audio_only_stream = for_audio_stream;
 					}, function(){});
 
 					vm.webrtc_connection = new webkitRTCPeerConnection(vm.CONFIG_WEBRTC); 
@@ -297,8 +285,25 @@
 				
          			//when a remote user adds stream to the peer connection, we display it 
 					vm.webrtc_connection.onaddstream = function(e){
+
 						vm.webrtc_remote_stream = e.stream;
 						vm.remote_video.src = window.URL.createObjectURL(vm.webrtc_remote_stream);
+
+						//mix 
+						window.AudioContext = window.AudioContext || window.webkitAudioContext;
+						var audioContext = new AudioContext();
+						var local_media_stream_source = audioContext.createMediaStreamSource( vm.webrtc_local_audio_only_stream ),
+							remote_media_stream_source =  audioContext.createMediaStreamSource( vm.webrtc_remote_stream );
+						
+						// Send the stream to MediaStream, which needs to be connected to PC
+						var mixed_streams = audioContext.createMediaStreamDestination();
+							local_media_stream_source.connect(mixed_streams);
+						
+						vm.webrtc_mixed_stream = new MediaStream();
+						vm.webrtc_mixed_stream.addTrack(vm.webrtc_local_audio_only_stream.getTracks()[0]); //add mixed audio
+						vm.webrtc_mixed_stream.addTrack(vm.webrtc_remote_stream.getTracks()[0]); //add remote video
+						vm.webrtc_mixed_stream.addTrack(vm.webrtc_remote_stream.getTracks()[1]); //add remote video
+
 					}
 
 					//setup ice handling
