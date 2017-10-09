@@ -226,8 +226,10 @@ module.exports = function(namespace_name, io){
             //end recording
             if ( ongoing_video_recording_stream ){
                 setTimeout(function () {
-                    ongoing_video_recording_stream.end();
-                    ongoing_video_recording_stream = null;
+                    if ( ongoing_video_recording_stream ){
+                        ongoing_video_recording_stream.end();
+                        ongoing_video_recording_stream = null;
+                    }
                 }, 1000);   
             }
             

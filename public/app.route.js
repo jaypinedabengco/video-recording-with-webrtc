@@ -26,6 +26,9 @@
         .when('/simple-webrtc', {
           template: '<simple-webrtc></simple-webrtc>'
         })
+        .when('/simple-webrtc/recorded-videos', {
+          template: '<recorded-videos-list></recorded-videos-list>'
+        })        
         .when('/tag-game', {
           template: '<tag-game></tag-game>'
         })        

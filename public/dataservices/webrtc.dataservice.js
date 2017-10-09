@@ -3,7 +3,7 @@
 
     angular
         .module('app.dataservice.module')
-        .service('app.dataservice.authentication', DataService);
+        .service('app.recorded-videos.dataservice', DataService);
 
 	/**
 	 * 
@@ -12,7 +12,7 @@
 	function DataService(apiDataService){
 
 		var services = {	
-			login
+			getRecordedVideos : getRecordedVideos
 		}
 
 		return services;
@@ -25,9 +25,9 @@
          * @param {*} data 
          * @param {*} auth_token 
          */
-		function login(username, password){
+		function getRecordedVideos(){
             return apiDataService
-                .post('/api/authenticate', {username : username, password : password})
+                .get('/api/get-recorded-videos')
                 .then(function(result){
                     return result.data;
                 });

@@ -12,7 +12,7 @@
 	function DataService(apiDataService){
 
 		var services = {	
-			login
+			login : login
 		}
 
 		return services;

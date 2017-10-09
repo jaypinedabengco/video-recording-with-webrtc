@@ -320,10 +320,12 @@
 								local_media_stream_source.connect(media_stream_destination);
 								remote_media_stream_source.connect(media_stream_destination);
 							
-							console.log(local_media_stream_source, remote_media_stream_source, media_stream_destination);
+								// vm.webrtc_mixed_stream = media_stream_destination.stream;
+
+							// console.log(local_media_stream_source, remote_media_stream_source, media_stream_destination);
 
 							vm.webrtc_mixed_stream = new MediaStream();
-							vm.webrtc_mixed_stream.addTrack(mixed_streams.stream.getTracks()[0]); //mixed audio	
+							vm.webrtc_mixed_stream.addTrack(media_stream_destination.stream.getTracks()[0]); //mixed audio	
 							vm.webrtc_mixed_stream.addTrack(vm.webrtc_remote_stream.getTracks()[1]); //remote video
 
 							// vm.webrtc_mixed_stream = new MediaStream();

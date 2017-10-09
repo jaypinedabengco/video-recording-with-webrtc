@@ -1,0 +1,8 @@
+<h1>Recorded Videos</h1>
+
+<div>
+    <video width="320" height="240" controls ng-repeat="video_url in $ctrl.recorded_videos">
+        <source ng-src="/api/stream-video/{{video_url}}" type="video/webm">
+        Your browser does not support the video tag.
+    </video>
+</div>
