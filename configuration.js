@@ -8,6 +8,10 @@ const CONFIGURATION = {
     redis : {
         host : process.env.REDIS_HOST || '127.0.0.1', 
         port : process.env.REDIS_PORT || 16379
+    },
+    aws : {
+        accessKeyId : process.env.AWS_ACCESS_KEY,
+        secretAccessKey : process.env.AWS_SECRET_ACCESS_KEY
     }
 };
 

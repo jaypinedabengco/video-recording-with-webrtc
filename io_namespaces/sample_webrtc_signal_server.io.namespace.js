@@ -3,7 +3,8 @@ var fs = require('fs');
 const RECORDED_VIDEOS_LOCATION = __basedir + '/tmp_recorded_videos/';
 
 var simple_webrtc_user_service = require('./../services/simple_webrtc.user.service'), 
-    authenticate_service = require('./../services/authenticate.service');
+    authenticate_service = require('./../services/authenticate.service'), 
+    video_interview_service = require('./../services/video-interview.service');
 
 /**
  * 
@@ -19,7 +20,6 @@ module.exports = function(namespace_name, io){
 
     function authenticate(socket, next){
         var auth_token = socket.handshake.query.auth_token;
-        console.log('auth_token', auth_token);
         if ( !auth_token ){
             console.error('CONNECT_FAILED', 'No Auth token');
             return socket.emit('connect_failed', 'No Auth token');
@@ -42,9 +42,7 @@ module.exports = function(namespace_name, io){
         
         //variables;
         var socket_id = socket.id;
-        var ongoing_video_recording_stream = null;
-
-        console.log('logged_user_info', socket.logged_user_info);
+        var ongoing_video_recorder = null;
         
         //events
         socket.on('disconnect', onDisconnect);
@@ -81,29 +79,19 @@ module.exports = function(namespace_name, io){
          * @param {*} message 
          */
         function onStartRecording(message){
-            if ( ongoing_video_recording_stream ){
+            if ( ongoing_video_recorder ){
                 return socket.emit('recording.error', 'there is an ongoing recording');
             }
 
             //initialize video recording stream
-
-            //create temporary video location
-            if ( !fs.existsSync(RECORDED_VIDEOS_LOCATION) ){
-                fs.mkdirSync(RECORDED_VIDEOS_LOCATION);
-            }
-
-            ongoing_video_recording_stream = fs.createWriteStream(RECORDED_VIDEOS_LOCATION + 'sample-' + (new Date().getTime()) + '.webm');
-
-            ongoing_video_recording_stream.on('error', error => {
-                console.log('hey!, error', error)
-            });
-
-            //setup on end
-            ongoing_video_recording_stream.on('finish', data => {
-                console.log('hey! the stream ended', data);
-            });
+            video_interview_service
+                .createVideoRecorder()
+                .then(
+                    (video_recorder) => {
+                        ongoing_video_recorder = video_recorder;
+                    }
+                )
             
-            console.log('onStartRecording', message);
         }
 
         /**
@@ -111,8 +99,8 @@ module.exports = function(namespace_name, io){
          * @param {*} video_chunks 
          */
         function onRecordVideoChunks(video_chunks){
-            console.log('onRecordVideoChunks', video_chunks);      
-            ongoing_video_recording_stream.write(video_chunks);      
+            ongoing_video_recorder
+                .addVideoChunk(video_chunks);
         }
 
         /**
@@ -120,11 +108,14 @@ module.exports = function(namespace_name, io){
          * @param {*} message 
          */
         function onStopRecording(message){
-            console.log('stopRecording', message);   
-            setTimeout(function () {
-                ongoing_video_recording_stream.end();
-                ongoing_video_recording_stream = null;
-            }, 1000);                     
+            video_interview_service
+                .stopRecording(ongoing_video_recorder)
+                .then(
+                    () => {
+                        ongoing_video_recorder = null; //open up for new recorder
+                    }, 
+                    (err) => console.log("onStopRecording Error", err)
+                )
         }
         
         /**
@@ -195,7 +186,6 @@ module.exports = function(namespace_name, io){
          */
         function onLeave(data){
             var target_username = data.target_username;
-            console.log("Disconnecting from", target_username); 
             socket.target_username = null;
 
             sendToTargetUser(target_username, 'incoming.onleave', 'left')
@@ -218,20 +208,23 @@ module.exports = function(namespace_name, io){
                     simple_webrtc_user_service
                         .getUser(target_username)
                         .then(
-                            target_user => target_user ? io.broadcast.to(target_user.socket_id).emit('incoming.onleave', 'disconnected') : '' //send to target
+                            target_user => {
+                                //send to target
+                                ( target_user ) ? io.to(target_user.socket_id).emit('incoming.onleave', 'disconnected') : '' 
+                            }
                         )  
                 }                    
             }
 
             //end recording
-            if ( ongoing_video_recording_stream ){
-                setTimeout(function () {
-                    if ( ongoing_video_recording_stream ){
-                        ongoing_video_recording_stream.end();
-                        ongoing_video_recording_stream = null;
-                    }
-                }, 1000);   
-            }
+            video_interview_service
+                .stopRecording(ongoing_video_recorder)
+                .then(
+                    () => {
+                        ongoing_video_recorder = null; //open up for new recorder
+                    }, 
+                    (err) => console.log("onStopRecording Error", err)
+                )
             
         }
 
@@ -244,7 +237,6 @@ module.exports = function(namespace_name, io){
                 .getUser(target_username)
                 .then(
                     target_user => { 
-                        console.log(emit_type, content, target_user);
                         nsp.to(target_user.socket_id).emit(emit_type, content) //send to target
                         return target_user;
                     }

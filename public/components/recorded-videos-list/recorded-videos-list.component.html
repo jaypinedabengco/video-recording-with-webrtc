@@ -1,8 +1,10 @@
 <h1>Recorded Videos</h1>
+<a href="/#!/simple-webrtc">Go Back</a>
 
-<div>
-    <video width="320" height="240" controls ng-repeat="video_url in $ctrl.recorded_videos">
+<div ng-repeat="video_url in $ctrl.recorded_videos">
+    <video width="320" height="240" controls>
         <source ng-src="/api/stream-video/{{video_url}}" type="video/webm">
         Your browser does not support the video tag.
     </video>
+    <div>Video Name : {{video_url}}</div>
 </div>
