@@ -1,7 +1,5 @@
 var fs = require('fs');
 
-const RECORDED_VIDEOS_LOCATION = __basedir + '/tmp_recorded_videos/';
-
 var simple_webrtc_user_service = require('./../services/simple_webrtc.user.service'), 
     authenticate_service = require('./../services/authenticate.service'), 
     video_interview_service = require('./../services/video-interview.service');

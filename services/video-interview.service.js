@@ -2,17 +2,15 @@ var fs = require('fs');
 
 var VideoRecorder = require('./lib/video-recorder.lib');
 
-const RECORDED_VIDEOS_LOCATION = __basedir + '/tmp_recorded_videos/';
+const RECORDED_VIDEOS_LOCATION = __basedir + '/tmp_recorded_videos/', 
+      S3_BUCKET_DESTINATION = 'sandbox-interview-storage';
 
 ////
 
-exports.RECORDED_VIDEOS_LOCATION = RECORDED_VIDEOS_LOCATION;
 exports.createVideoRecorder = createVideoRecorder;
 exports.stopRecording = stopRecording;
 exports.getAllVideoNames = getAllVideoNames;
 exports.getVideoStreamFromLocalFile = getVideoStreamFromLocalFile;
-exports.getVideoStreamFromS3 = getVideoStreamFromS3;
-
 
 ////
 
@@ -23,11 +21,10 @@ function createVideoRecorder(){
 
     return new Promise((resolve, reject) => {
 
-        var random_filename = 'recorded-video-' + (Math.random() * 10000) + '-' + new Date().getTime() + '-rvi.webm';
-
         var video_recorder = new VideoRecorder({
-            filename : random_filename, 
-            temporary_file_location : RECORDED_VIDEOS_LOCATION
+            filename : 'recorded-video.webm', 
+            temporary_file_location : RECORDED_VIDEOS_LOCATION, 
+            s3_bucket_destination : S3_BUCKET_DESTINATION
         });
 
         //add event handlers here        
@@ -35,6 +32,7 @@ function createVideoRecorder(){
             console.log('error', err);
         });
 
+        //send video recorder
         return resolve(video_recorder);
 
     });
@@ -67,20 +65,6 @@ function stopRecording(video_recorder){
                 ])
             )
             .then(resolve, reject);
-        // video_recorder
-        //     .stopRecording()
-        //     .then(
-        //         video_recorder.deleteRecordedFile()
-        //     ).then(()=> {
-
-        //         return video_recorder
-        //             .getStream()
-        //             .then((stream)=>{
-        //                 console.log('stream', stream);
-        //                 return stream;
-        //             });
-
-        //     }, reject);
     });        
 }
 
@@ -128,12 +112,4 @@ function getVideoStreamFromLocalFile(video_name){
 
     });
     
-}
-
-/**
- * 
- * @param {*} video_name 
- */
-function getVideoStreamFromS3(video_name){
-
 }

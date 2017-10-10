@@ -35,7 +35,7 @@ function getRecordedVideos(req, res, next){
 function streamVideo(req, res, next){
     var video_name = req.params.video_name;
     video_interview_service
-        .getVideoStream(video_name)
+        .getVideoStreamFromLocalFile(video_name)
         .then(
             (video_stream) => {
                 res.writeHead(200, video_stream.header);                

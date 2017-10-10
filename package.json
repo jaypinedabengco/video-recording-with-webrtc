@@ -8,20 +8,23 @@
     "dev-second-server": "HTTP_PORT=8082 HTTPS_PORT=8445 DEBUG=video-recording-with-webrtc:server ./node_modules/.bin/nodemon --config nodemon.json ./bin/www"
   },
   "dependencies": {
-    "aws-sdk": "2.7.20",    
+    "aws-sdk": "2.7.20",
     "bluebird": "3.5.0",
     "body-parser": "1.15.1",
     "cookie-parser": "1.4.3",
     "debug": "2.2.0",
     "express": "4.13.4",
+    "install": "0.10.1",
     "jsonwebtoken": "8.0.1",
     "morgan": "1.7.0",
+    "npm": "5.4.2",
     "redis": "2.8.0",
     "serve-favicon": "2.3.0",
     "socket.io": "2.0.3",
-    "socket.io-redis": "^5.2.0",
+    "socket.io-redis": "5.2.0",
     "socketio-jwt": "4.5.0",
-    "underscore": "^1.8.3"
+    "underscore": "1.8.3",
+    "uuid": "3.1.0"
   },
   "devDependencies": {
     "nodemon": "1.11.0"
