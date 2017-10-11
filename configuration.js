@@ -16,11 +16,11 @@ const CONFIGURATION = {
             region: 'ap-southeast-1',
             pipeline_id: '1507540873164-vqf5mt', 
             input_bucket: { //where videos to transcode are located
-                bucket_name: 'sandbox-interview-storage', 
-                prefix: 'recorded_videos/'
+                bucket_name: 'studylane-recorded-video.in', 
+                prefix: 'recorded_videos/sandbox/'
             }, 
             transcode_job_as_mpeg_dash: {
-                prefix: 'transcoded_videos/',
+                prefix: 'transcoded_videos/sandbox/',
                 outputs: {
                     video: {
                         key: 'video.mp4',

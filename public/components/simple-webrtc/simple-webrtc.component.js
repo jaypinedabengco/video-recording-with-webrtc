@@ -38,8 +38,8 @@
 			vm.webrtc_datachannel;
 			vm.webrtc_local_video;
 			vm.webrtc_remote_video;
-			vm.webrtc_local_audio_only_stream;
 			vm.webrtc_mixed_stream;
+			vm.webrtc_local_stream;
 			vm.webrtc_remote_stream;
 			vm.webrtc_media_recorder;
 			vm.recorded_video_chunks = [];
@@ -262,7 +262,7 @@
 				//********************** 		
 				webrtcService.getUserMedia({video:true, audio:true}, function(stream){
 
-					// vm.webrtc_local_stream = stream; //set global stream
+					vm.webrtc_local_stream = stream; //set global stream
 
 					//initialize dom elements
 					vm.local_video = document.querySelector('#localVideo'); 
@@ -284,58 +284,26 @@
 						vm.webrtc_remote_stream = e.stream;
 						vm.remote_video.src = window.URL.createObjectURL(vm.webrtc_remote_stream); //add video on remote						
 
-
 						//Do audio merging here..
-						//GET local Audio
-						webrtcService.getUserMedia({video:false, audio:true}, function(local_audio_stream){
 
-							vm.webrtc_local_audio_only_stream = local_audio_stream;
+						//mix 
+						var remote_audio_stream = new MediaStream([vm.webrtc_remote_stream.getTracks()[0]]); //get remote audio tracks	
+						var local_audio_stream = new MediaStream([vm.webrtc_local_stream.getTracks()[0]]); //get local audio tracks						
 
-							/**
-								window.AudioContext = window.AudioContext || window.webkitAudioContext;
-								var audioContext = new AudioContext();
-								var mediaStreamSource = audioContext.createMediaStreamSource( local_stream ),
-								participant1 =  audioContext.createMediaStreamSource( participant1_stream ),
-								participantN = audioContext.createMediaStreamSource( participantN_stream );
+						window.AudioContext = window.AudioContext || window.webkitAudioContext;
+						var audioContext = new AudioContext();
+						var local_media_stream_source = audioContext.createMediaStreamSource( local_audio_stream ),
+							remote_media_stream_source =  audioContext.createMediaStreamSource( remote_audio_stream );
+						
+						// Send the stream to MediaStream, which needs to be connected to PC
+						var media_stream_destination = audioContext.createMediaStreamDestination();
+							local_media_stream_source.connect(media_stream_destination);
+							remote_media_stream_source.connect(media_stream_destination);
 
-								// Send the stream to MediaStream, which needs to be connected to PC
-								var destination_participant1 = audioContext.createMediaStreamDestination();
-								mediaStreamSource.connect(destination_participant1); // Send local stream to the mixer
-								participantN.connect(destination_participant1); // add all participants to the mix
-								// Add the result stream to PC for participant1 , most likely you will want to disconnect the previous one using removeStream
-								pc.addStream( destination_participant1.stream );
-							*/
-
-
-							//mix 
-							var remote_audio_stream = new MediaStream([vm.webrtc_remote_stream.getTracks()[0]]); //get audio only on user stream							
-
-							window.AudioContext = window.AudioContext || window.webkitAudioContext;
-							var audioContext = new AudioContext();
-							var local_media_stream_source = audioContext.createMediaStreamSource( local_audio_stream ),
-								remote_media_stream_source =  audioContext.createMediaStreamSource( remote_audio_stream );
-							
-							// Send the stream to MediaStream, which needs to be connected to PC
-							var media_stream_destination = audioContext.createMediaStreamDestination();
-								local_media_stream_source.connect(media_stream_destination);
-								remote_media_stream_source.connect(media_stream_destination);
-							
-								// vm.webrtc_mixed_stream = media_stream_destination.stream;
-
-							// console.log(local_media_stream_source, remote_media_stream_source, media_stream_destination);
-
-							vm.webrtc_mixed_stream = new MediaStream();
-							vm.webrtc_mixed_stream.addTrack(media_stream_destination.stream.getTracks()[0]); //mixed audio	
-							vm.webrtc_mixed_stream.addTrack(vm.webrtc_remote_stream.getTracks()[1]); //remote video
-
-							// vm.webrtc_mixed_stream = new MediaStream();
-							// vm.webrtc_mixed_stream.addTrack(vm.webrtc_remote_stream.getTracks()[0]); //add remote audio
-							// vm.webrtc_mixed_stream.addTrack(local_media_stream_source.mediaStream.getTracks()[0]); //add mixed audio							
-							// vm.webrtc_mixed_stream.addTrack(vm.webrtc_remote_stream.getTracks()[1]); //add remote video
-							
-							console.log(vm.webrtc_mixed_stream.getTracks());
-
-						}, function(){});
+						//create mixed stream
+						vm.webrtc_mixed_stream = new MediaStream();
+						vm.webrtc_mixed_stream.addTrack(media_stream_destination.stream.getTracks()[0]); //mixed audio	
+						vm.webrtc_mixed_stream.addTrack(vm.webrtc_remote_stream.getTracks()[1]); //remote video
 
 					}
 

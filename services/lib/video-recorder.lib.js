@@ -122,6 +122,7 @@ function VideoRecorder(data){
      */
     function addVideoChunk(chunk){
         return new Promise((resolve, reject) => {
+            console.log('BUILDING VIDEO ', private.file_name);            
             private.file_write_stream.write(chunk);
             resolve(chunk); //just return chunk
         });            
@@ -224,6 +225,12 @@ function VideoRecorder(data){
 
             const TRANSCODED_FILE_PREFIX = JOB_CONFIG.prefix + private.file_s3_random_prefix;
 
+            //create UNIQUE key names
+            const OUTPUT_VIDEO_KEY = [uuidv4(), JOB_CONFIG.outputs.video.key].join('-');
+            const OUTPUT_AUDIO_KEY = [uuidv4(), JOB_CONFIG.outputs.audio.key].join('-');
+            const PLAYLIST_NAME = [uuidv4(), JOB_CONFIG.playlist.name].join('-');
+            const PLAYLIST_NAME_ON_TRANSCODE = [uuidv4(), JOB_CONFIG.playlist.name_on_transcode].join('-');
+
             var transcode_job = {
                 PipelineId: config.aws.pipeline_id, /* required */
                 Input: {
@@ -232,25 +239,25 @@ function VideoRecorder(data){
                 OutputKeyPrefix : TRANSCODED_FILE_PREFIX,
                 Outputs: [
                   { //video
-                    Key: JOB_CONFIG.outputs.video.key, //use prefix used on 
+                    Key: OUTPUT_VIDEO_KEY, 
                     PresetId: JOB_CONFIG.outputs.video.preset_id, //mpeg-dash video 600k
                     SegmentDuration: JOB_CONFIG.outputs.video.segment_duration, 
                     ThumbnailPattern: JOB_CONFIG.outputs.video.thumbnail_pattern, 
                     Rotate: JOB_CONFIG.outputs.video.rotate
                   },
                   { //audio
-                    Key: JOB_CONFIG.outputs.audio.key,
+                    Key: OUTPUT_AUDIO_KEY,
                     PresetId: JOB_CONFIG.outputs.audio.preset_id, //mpeg-dash audio 128k
                     SegmentDuration: JOB_CONFIG.outputs.audio.segment_duration 
                   }     
                 ],
                 Playlists: [
                   {
+                    Name: PLAYLIST_NAME,
                     Format: JOB_CONFIG.playlist.format,
-                    Name: JOB_CONFIG.playlist.name,
                     OutputKeys: [
-                        JOB_CONFIG.outputs.video.key,
-                        JOB_CONFIG.outputs.audio.key,
+                        OUTPUT_VIDEO_KEY,
+                        OUTPUT_AUDIO_KEY,
                     ]
                   }
                 ]
@@ -266,9 +273,9 @@ function VideoRecorder(data){
                 //return 'keys' on end of request
                 return resolve({
                     video_key : TRANSCODED_FILE_PREFIX + JOB_CONFIG.outputs.video.key, 
-                    audio_key : TRANSCODED_FILE_PREFIX + JOB_CONFIG.outputs.audio.key, 
+                    audio_key : TRANSCODED_FILE_PREFIX + OUTPUT_AUDIO_KEY, 
                     thumbnail_key : TRANSCODED_FILE_PREFIX + JOB_CONFIG.outputs.video.thumbnail_name_on_transcode,
-                    playlist_key : TRANSCODED_FILE_PREFIX + JOB_CONFIG.playlist.name_on_transcode
+                    playlist_key : TRANSCODED_FILE_PREFIX + PLAYLIST_NAME_ON_TRANSCODE
                 });
               });             
         });            

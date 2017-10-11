@@ -1,0 +1,3 @@
+# For AWS Elastic Transcoder
+ - make destination bucket for transcoded files are readable for public
+    * more acceptable if we can make a way to 
