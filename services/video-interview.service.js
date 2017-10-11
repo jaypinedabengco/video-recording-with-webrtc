@@ -23,8 +23,7 @@ function createVideoRecorder(){
 
         var video_recorder = new VideoRecorder({
             filename : 'recorded-video.webm', 
-            temporary_file_location : RECORDED_VIDEOS_LOCATION, 
-            s3_bucket_destination : S3_BUCKET_DESTINATION
+            temporary_file_location : RECORDED_VIDEOS_LOCATION
         });
 
         //add event handlers here        
@@ -64,6 +63,15 @@ function stopRecording(video_recorder){
                     video_recorder.deleteRecordedFile() //delete recorded file
                 ])
             )
+            .then(()=> {
+               return video_recorder
+                    .transcodeUploadedFileOnS3ToMPEGDash()
+                    .then((transcode_info) => {
+                        //save transcoded content on DB or something..
+                        console.log('transcode info', transcode_info);
+                        return Promise.resolve(transcode_info);
+                    });
+            })
             .then(resolve, reject);
     });        
 }
