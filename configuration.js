@@ -24,7 +24,7 @@ const VIDEO_TRANSCODING_INPUT_BUCKET_REGION = process.env.VT_INPUT_BUCKET_REGION
 const VIDEO_TRANSCODING_INPUT_PREFIX = process.env.VT_INPUT_PREFIX || 'recorded_videos/';
 
 //OUTPUT
-const VIDEO_TRANSCODING_OUTPUT_PREFIX = process.env.VT_INPUT_PREFIX || 'transcoded_videos/';
+const VIDEO_TRANSCODING_OUTPUT_PREFIX = process.env.VT_OUTPUT_PREFIX || 'transcoded_videos/';
 
 //REDIS
 const REDIS_HOST = process.env.VT_REDIS_HOST || '127.0.0.1';
