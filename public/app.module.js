@@ -6,6 +6,7 @@
         //external modules
         'ngMaterial',
         'ngRoute',
+        'ngCookies',        
         'ngMessages',
         'btford.socket-io', 
       

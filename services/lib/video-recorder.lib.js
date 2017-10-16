@@ -5,7 +5,6 @@ var fs = require('fs'),
 var config  = require('../../configuration').video_transcoding;
 
 //preset id lists : http://docs.aws.amazon.com/elastictranscoder/latest/developerguide/system-presets.html
-
 // CREATE pipeline on AWS Console ( Due to pipeline limit per aws account )
 // const PIPELINE_CONFIG = {
 //     name : 'Video Interview Transcoder (Development)', 
@@ -47,18 +46,19 @@ aws.config.update({
  */
 function VideoRecorder(data){
     
-    var random_s3_prefix = uuidv4() + (new Date().getTime()) + '/';  //build keyname ( along with directory )  
-    var random_file_name = [uuidv4(), (new Date().getTime()), data.filename].join('-');
+    const UNIQUE_ID = [uuidv4(), (new Date().getTime())].join('-');
+    const UNIQUE_FILENAME = [UNIQUE_ID, data.filename].join('-');
 
     //internal use
     var private = {
-        file_name : random_file_name, 
+        unique_id : UNIQUE_ID,
+        file_name : UNIQUE_FILENAME, 
         file_location : data.temporary_file_location, 
-        file_fullpath : data.temporary_file_location + random_file_name,
-        file_write_stream : null, 
+        file_fullpath : data.temporary_file_location + UNIQUE_FILENAME,
         file_s3_bucket_destination : config.aws.input_bucket.bucket_name,        
-        file_s3_random_prefix : random_s3_prefix,
-        file_s3_file_fullpath : config.aws.input_bucket.prefix + random_s3_prefix + random_file_name, //full path on s3
+        file_s3_file_fullpath : config.aws.input_bucket.prefix + UNIQUE_ID + '/' + UNIQUE_FILENAME, //full path on s3
+        file_write_stream : null, 
+        file_processing_in_progress : false
     };
 
     //will be available on public
@@ -73,7 +73,8 @@ function VideoRecorder(data){
         deleteRecordedFile : deleteRecordedFile,
         uploadRecordedFileToS3 : uploadRecordedFileToS3,
         transcodeUploadedFileOnS3ToMPEGDash : transcodeUploadedFileOnS3ToMPEGDash,
-        fileExists : fileExists
+        fileExists : fileExists, 
+        is_video_processing_in_progress : false
     };
 
     initialize(); //run
@@ -223,13 +224,15 @@ function VideoRecorder(data){
 
             const JOB_CONFIG = config.aws.transcode_job_as_mpeg_dash;
 
-            const TRANSCODED_FILE_PREFIX = JOB_CONFIG.prefix + private.file_s3_random_prefix;
+            const TRANSCODED_FILE_PREFIX = JOB_CONFIG.prefix + private.unique_id + '/';
 
             //create UNIQUE key names
             const OUTPUT_VIDEO_KEY = [uuidv4(), JOB_CONFIG.outputs.video.key].join('-');
             const OUTPUT_AUDIO_KEY = [uuidv4(), JOB_CONFIG.outputs.audio.key].join('-');
-            const PLAYLIST_NAME = [uuidv4(), JOB_CONFIG.playlist.name].join('-');
-            const PLAYLIST_NAME_ON_TRANSCODE = [uuidv4(), JOB_CONFIG.playlist.name_on_transcode].join('-');
+
+            var PLAYLIST_UNIQUE_PREFIX = uuidv4();
+            const PLAYLIST_NAME = [PLAYLIST_UNIQUE_PREFIX, JOB_CONFIG.playlist.name].join('-');
+            const PLAYLIST_NAME_ON_TRANSCODE = [PLAYLIST_UNIQUE_PREFIX, JOB_CONFIG.playlist.name_on_transcode].join('-');
 
             var transcode_job = {
                 PipelineId: config.aws.pipeline_id, /* required */
@@ -268,10 +271,10 @@ function VideoRecorder(data){
                 if ( err ){
                     return reject(err);
                 }
-                console.log(data);
-
+                
                 //return 'keys' on end of request
                 return resolve({
+                    id : private.unique_id,
                     video_key : TRANSCODED_FILE_PREFIX + JOB_CONFIG.outputs.video.key, 
                     audio_key : TRANSCODED_FILE_PREFIX + OUTPUT_AUDIO_KEY, 
                     thumbnail_key : TRANSCODED_FILE_PREFIX + JOB_CONFIG.outputs.video.thumbnail_name_on_transcode,

@@ -1,4 +1,17 @@
-<h1>Recorded Videos</h1>
-<a href="/#!/simple-webrtc">Go Back</a>
+<div>
 
-<video id="videoPlayer" controls></video>
+    <h1>Recorded Videos</h1>
+    <a href="/#!/simple-webrtc">Go Back</a>
+    
+    <div class="video-player-container">
+        <video id="videoPlayer" controls></video>
+    </div>
+    
+    <div class="recorded-videos-list-container">
+        <div class="recorded-video" ng-repeat="recorded_video in $ctrl.recorded_videos" ng-click="$ctrl.playVideo(recorded_video.playlist_key)">
+            {{recorded_video.id}}
+            <img ng-src="{{recorded_video.thumbnail_key}}" />
+        </div>
+    </div>
+
+</div>

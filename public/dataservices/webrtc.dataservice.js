@@ -12,7 +12,8 @@
 	function DataService(apiDataService){
 
 		var services = {	
-			getRecordedVideos : getRecordedVideos
+            getRecordedVideos : getRecordedVideos,
+            getCFSignedURLCookies : getCFSignedURLCookies
 		}
 
 		return services;
@@ -21,9 +22,6 @@
 
         /**
          * 
-         * @param {*} api_url 
-         * @param {*} data 
-         * @param {*} auth_token 
          */
 		function getRecordedVideos(){
             return apiDataService
@@ -31,7 +29,18 @@
                 .then(function(result){
                     return result.data;
                 });
-		}
+        }
+        
+        /**
+         * 
+         */
+        function getCFSignedURLCookies(){
+            return apiDataService
+                .get('/api/get-cf-signed-cookies')
+                .then(function(result){
+                    return result.data;
+                });            
+        }
 
 	};	     
     

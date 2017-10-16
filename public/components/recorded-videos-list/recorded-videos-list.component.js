@@ -10,16 +10,22 @@
 		/////
 
 		ComponentController.$inject = [
-			'$scope', 'app.recorded-videos.dataservice'
+			'$scope', '$cookies',
+			'app.recorded-videos.dataservice'
 		];
 
 		function ComponentController(
-			$scope, recordedVideosDataservice
+			$scope, $cookies, 
+			recordedVideosDataservice
 		) {
 
 			var vm = this;
 
 			vm.recorded_videos = [];
+
+			vm.setSignedCookies = setSignedCookies;
+			vm.updateRecordedVideoList = updateRecordedVideoList;
+			vm.playVideo = playVideo;
 			
 			//on load
 			vm.$onInit = activate;
@@ -29,20 +35,60 @@
 			////
 
 			function activate(){
-				var url = "https://studylane-transcoded-videos.s3-ap-southeast-1.amazonaws.com/transcoded_videos/sandbox/4e296b51-29b1-4734-87ff-4267dd2c22a51507711977403/e2011c32-8913-45c2-bb0b-0ae1c22b7525-video.mpd?X-Amz-Algorithm=AWS4-HMAC-SHA256&X-Amz-Credential=AKIAINL3KWVNRCT4KV4Q/20171011/ap-southeast-1/s3/aws4_request&X-Amz-Date=20171011T085618Z&X-Amz-Expires=3600&X-Amz-SignedHeaders=host&X-Amz-Signature=90c231829ccf5a7cee4026fa8bb41e86429a6642b066ed0e8155ab06a92f2095";
-				var player = dashjs.MediaPlayer().create();
-				player.initialize(document.querySelector("#videoPlayer"), url, true);
+				// var url = "https://d3buwf0gafsb59.cloudfront.net/transcoded_videos/sandbox/d5c30df3-cce5-4ddc-979b-91dd3ab328ba-1507765300622-recorded-video.webm/81234137-dacf-42b2-8684-a2168dd102fa-video.mpd";
+				// var player = dashjs.MediaPlayer().create();
+				// player.initialize(document.querySelector("#videoPlayer"), url, true);
 
-				// recordedVideosDataservice
-				// 	.getRecordedVideos()
-				// 	.then(
-				// 		function(result){
-				// 			vm.recorded_videos = result;
-				// 		}, 
-				// 		function(error){
-				// 			console.log('error', error);
-				// 		}
-				// 	)
+				//set CF cookie first, to be able to view videos
+				recordedVideosDataservice
+					.getCFSignedURLCookies()
+					.then(
+						function(cf_cookies){
+							vm.setSignedCookies(cf_cookies);
+							updateRecordedVideoList();
+						}
+					)
+			}
+
+			/**
+			 * 
+			 */
+			function updateRecordedVideoList(){
+				return recordedVideosDataservice
+					.getRecordedVideos()
+					.then(
+						function(result){
+							vm.recorded_videos = result;
+						}, 
+						function(error){
+							console.log('error', error);
+						}
+					)				
+			}
+
+			/**
+			 * 
+			 * @param {*} video_url 
+			 */
+			function playVideo(video_url){
+				var player = dashjs.MediaPlayer().create();
+				player.initialize(document.querySelector("#videoPlayer"), video_url, true);
+			}
+
+			/**
+			 * 
+			 * @param {*} cookies 
+			 */
+			function setSignedCookies(signed_cookies){
+				
+				var cookie_options = {
+					secure : true
+				};
+
+				//set cookie to site
+				for (var cookie_id in signed_cookies) {
+					$cookies.put(cookie_id, signed_cookies[cookie_id], cookie_options);
+				}
 			}
 
 		}		

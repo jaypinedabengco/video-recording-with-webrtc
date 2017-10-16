@@ -47,7 +47,6 @@ module.exports = function(namespace_name, io){
         socket.on('offer', onOffer);
         socket.on('answer', onAnswer);
         socket.on('candidate', onCandidate);
-        socket.on('hangup', onHangup);
         socket.on('leave', onLeave);
         socket.on('startRecording', onStartRecording);
         socket.on('recordVideoChunks', onRecordVideoChunks);
@@ -177,21 +176,6 @@ module.exports = function(namespace_name, io){
                     },
                     error => socket.emit('candidate.error', error)
                 )               
-        }
-
-        /**
-         * 
-         * @param {*} data 
-         */
-        function onHangup(data){
-            var target_username = data.target_username;
-            socket.target_username = null;
-
-            sendToTargetUser(target_username, 'incoming.onhangup', 'hangup')
-                .then(
-                    target_user =>  socket.emit('onhangup.success', true), //send to self
-                    error => socket.emit('onhangup.error', error)
-                );            
         }
 
         /**

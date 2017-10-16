@@ -1,3 +1,42 @@
+########################
+ STEPS ON AWS SIDE
+########################
+
+    - Create an S3 bucket as an 'input' bucket for videos to transcode. Remember the region where it was created.
+    - Create or use created S3 bucket as an 'output' bucket for transcoded video. Remember the region where it was created.
+    - Create an AWS Elastic Transcoder Pipeline, should create the pipeline on same region as where buckets for input and output are located. 
+    - Create a Cloudfront Distribution, pointing to output bucket and set a CNAME. This will be used when serving recorded videos.
+    - Assign CloudFront origin access identity 
+        * http://docs.aws.amazon.com/AmazonCloudFront/latest/DeveloperGuide/private-content-restricting-access-to-s3.html#private-content-creating-oai-console    
+    - Implement CORS implementation for both S3 and Cloudfront : 
+        - http://blog.celingest.com/en/2014/10/02/tutorial-using-cors-with-cloudfront-and-s3/
+    - Create Cloudfront KeyPair & Download 
+        - http://docs.aws.amazon.com/AmazonCloudFront/latest/DeveloperGuide/private-content-trusted-signers.html#private-content-creating-cloudfront-key-pairs-procedure
+    - Implement security features for both s3 bucket and Cloudfront Distribution (Researching)
+    - Remember the following, cause it will be used on the system
+        * pipeline_id (from newly or existing Elastic Transcoder Pipeline)
+        * input bucket name
+        * region of input bucket (ex. ap-southeast-1)
+        * cloudfront domain (CNAME) cause we will be using signed Cookies
+
+#######
+NOTES
+#######
+
 # For AWS Elastic Transcoder
  - make destination bucket for transcoded files are readable for public
-    * more acceptable if we can make a way to 
+    * try to implement a better & secure way, read more here :
+        * http://docs.aws.amazon.com/AmazonCloudFront/latest/DeveloperGuide/PrivateContent.html 
+        * http://docs.aws.amazon.com/AmazonCloudFront/latest/DeveloperGuide/private-content-restricting-access-to-s3.html
+        * http://docs.aws.amazon.com/AmazonCloudFront/latest/DeveloperGuide/private-content-restricting-access-to-s3.html#private-content-creating-oai
+    * checkout 'Unified Streaming' as an alternative to using AWS Elastic Transcoder 
+# For S3 and Cloudfront 
+    * Set CORS 
+        - (http://blog.celingest.com/en/2014/10/02/tutorial-using-cors-with-cloudfront-and-s3/)
+
+* TODO 
+    - Research on how to improve security, like should only have 'Pre-signed' URLs when accessing the video
+
+
+
+#SCRATCH

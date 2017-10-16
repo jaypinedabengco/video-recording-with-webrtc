@@ -4,7 +4,7 @@ exports.authenticate = authenticate;
 
 /////
 
-clearRedisAndInitializeUsers();
+// clearRedisAndInitializeUsers();
 
 function clearRedisAndInitializeUsers(){
 

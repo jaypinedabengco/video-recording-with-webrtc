@@ -38,9 +38,14 @@
 			vm.webrtc_datachannel;
 			vm.webrtc_local_video;
 			vm.webrtc_remote_video;
+
 			vm.webrtc_mixed_stream;
 			vm.webrtc_local_stream;
 			vm.webrtc_remote_stream;
+			vm.remote_audio_stream;
+			vm.local_audio_stream;
+			vm.for_view_stream;
+			
 			vm.webrtc_media_recorder;
 			vm.recorded_video_chunks = [];
 			vm.recorded_videos_list = [];
@@ -56,7 +61,10 @@
 			vm.hangup = hangup;
 			vm.toggleRecording = toggleRecording;
 			vm.io_sendMessageToTarget = io_sendMessageToTarget;
-			vm.handleLeave = handleLeave;
+			vm.handleHangup = handleHangup;
+			vm.startVideoInterview = startVideoInterview;
+			vm.endVideoInterview = endVideoInterview;
+			vm.closeStream = closeStream;
 
 			//socket events
 
@@ -87,6 +95,7 @@
 					vm.io_signaling_server.on('incoming.offer', io_incomingOffer);
 					vm.io_signaling_server.on('incoming.answer', io_incomingAnswer);
 					vm.io_signaling_server.on('incoming.candidate', io_incomingCandidate);
+					vm.io_signaling_server.on('incoming.onhangup', io_incomingHangup);
 					vm.io_signaling_server.on('incoming.onleave', io_incomingOnLeave);
 					vm.io_signaling_server.on('available_users_for_call.update', io_updateUserToCallList);
 
@@ -119,16 +128,21 @@
 			  */
 			 function connectTo(target_username){
 				 
-				if (target_username.length > 0) { 
-				   //make an offer 
-				   vm.webrtc_connection.createOffer(function (offer) { 
-						vm.io_sendMessageToTarget(target_username, 'offer', {
-							offer : offer
+				if (target_username.length > 0) {
+					vm.startVideoInterview(function(err){
+						if ( err ){
+							return alert("An error has occurred."); 
+						}
+						//make an offer 
+						vm.webrtc_connection.createOffer(function (offer) { 
+							vm.io_sendMessageToTarget(target_username, 'offer', {
+								offer : offer
+							}); 
+							vm.webrtc_connection.setLocalDescription(offer); 
+						}, function (error) { 
+							return alert("An error has occurred."); 
 						}); 
-						vm.webrtc_connection.setLocalDescription(offer); 
-				   }, function (error) { 
-					  alert("An error has occurred."); 
-				   }); 
+					}); 
 				} 
 			 }
 
@@ -136,21 +150,17 @@
 			  * 
 			  */
 			 function hangup(){
-				vm.io_sendMessageToTarget(vm.target_username, 'leave', {});					
-				vm.handleLeave();
-				vm.logged_in_username = null;
+				vm.io_sendMessageToTarget(vm.target_username, 'hangup', {});					
+				vm.handleHangup();
+				// vm.logged_in_username = null;
 			 }
 
 			 /**
 			  * 
 			  */
-			 function handleLeave(){
+			 function handleHangup(){
+				vm.endVideoInterview();
 				vm.target_username = null; 
-				vm.remote_video.src = null;
-				 
-				vm.webrtc_connection.close(); 
-				vm.webrtc_connection.onicecandidate = null; 
-				vm.webrtc_connection.onaddstream = null; 
 			 }	
 
 			 /**
@@ -223,6 +233,150 @@
 				}
 			 }
 
+			 
+			 /**
+			  * 
+			  * @param {*} logged_username 
+			  */
+			 function startVideoInterview(callback){				
+				
+				//********************** 
+				//Starting a peer connection 
+				//********************** 	
+				vm.webrtc_connection = new webkitRTCPeerConnection(vm.CONFIG_WEBRTC); 
+				
+				webrtcService.getUserMedia({video:true, audio:true}, function(stream){
+
+					vm.webrtc_local_stream = stream; //set global stream
+
+					//initialize dom elements
+					vm.local_video = document.querySelector('#localVideo'); 
+					vm.remote_video = document.querySelector('#remoteVideo');
+
+					//VIDEO ONLY
+					webrtcService.getUserMedia({video:true, audio:false}, function(for_view_stream){
+						vm.for_view_stream = for_view_stream;
+						vm.local_video.src = window.URL.createObjectURL(for_view_stream);					
+					}, function(){});
+					
+					// setup stream listening 
+					vm.webrtc_connection.addStream(stream);					
+				
+						//when a remote user adds stream to the peer connection, we display it 
+					vm.webrtc_connection.onaddstream = function(e){
+
+						vm.webrtc_remote_stream = e.stream;
+						vm.remote_video.src = window.URL.createObjectURL(vm.webrtc_remote_stream); //add video on remote						
+
+						//Do audio merging here..
+
+						//mix 
+						vm.remote_audio_stream = new MediaStream([vm.webrtc_remote_stream.getTracks()[0]]); //get remote audio tracks	
+						vm.local_audio_stream = new MediaStream([vm.webrtc_local_stream.getTracks()[0]]); //get local audio tracks						
+
+						window.AudioContext = window.AudioContext || window.webkitAudioContext;
+						var audioContext = new AudioContext();
+						var local_media_stream_source = audioContext.createMediaStreamSource( vm.local_audio_stream ),
+							remote_media_stream_source =  audioContext.createMediaStreamSource( vm.remote_audio_stream );
+						
+						// Send the stream to MediaStream, which needs to be connected to PC
+						var media_stream_destination = audioContext.createMediaStreamDestination();
+							local_media_stream_source.connect(media_stream_destination);
+							remote_media_stream_source.connect(media_stream_destination);
+
+						//create mixed stream
+						vm.webrtc_mixed_stream = new MediaStream();
+						vm.webrtc_mixed_stream.addTrack(media_stream_destination.stream.getTracks()[0]); //mixed audio	
+						vm.webrtc_mixed_stream.addTrack(vm.webrtc_remote_stream.getTracks()[1]); //remote video
+
+					}
+
+					//setup ice handling
+					//when the browser finds an ice candidate we send it to another peer 
+					vm.webrtc_connection.onicecandidate = function (event) { 
+						if (event.candidate) { 
+							vm.io_sendMessageToTarget(vm.target_username, 'candidate', {
+								candidate : event.candidate
+							});
+						} 
+					}; 
+
+					return callback(null, vm.webrtc_connection);
+
+				}, function(error){
+					console.log('error', error);
+					alert('Unable to access media devices, (Video & Audio), please check if you devices if working');
+					return callback(err);
+				});	
+
+				// vm.webrtc_connection.onconnectionstatechange = function(event){
+				// 	console.log('state changed!');
+				// 	switch(webrtc_connection.connectionState) {
+				// 		case "connected":
+				// 		console.log('YOU HAVE CONNECT', pc.connectionState);
+				// 		  // The connection has become fully connected
+				// 		  break;
+				// 		case "disconnected":
+				// 		case "failed":
+				// 		console.log("DISCONNECT???", pc.connectionState)
+				// 		  // One or more transports has terminated unexpectedly or in an error
+				// 		  break;
+				// 		case "closed":
+				// 		console.log("Closed???", pc.connectionState)
+				// 		  // The connection has been closed
+				// 		  break;
+				// 	}
+				// }
+			 }
+
+			 /**
+			  * 
+			  */
+			 function endVideoInterview(){
+				vm.remote_video.src = null;
+				vm.local_video.src = null;
+
+				//close streams
+				vm.closeStream(vm.local_audio_stream);
+				vm.closeStream(vm.remote_audio_stream);
+				vm.closeStream(vm.webrtc_mixed_stream);
+				vm.closeStream(vm.webrtc_local_stream);
+				vm.closeStream(vm.webrtc_remote_stream);
+				vm.closeStream(vm.for_view_stream);
+
+				if ( vm.webrtc_connection ){
+					vm.webrtc_connection.close(); 
+					vm.webrtc_connection.onicecandidate = null; 
+					vm.webrtc_connection.onaddstream = null; 						
+				}
+			 }
+
+			 /**
+			  * 
+			  * @param {*} stream 
+			  */
+			 function closeStream(stream){
+				if ( stream ){
+					(stream.stop) ? stream.stop() : '';
+
+					//stop audio tracks
+					if ( stream.getAudioTracks() ){
+						stream.getAudioTracks().forEach(function(track){
+							console.log('closing audio tracks', track);
+							track.stop();
+						});
+					}
+
+					//stop video tracks
+					if ( stream.getVideoTracks() ){
+						stream.getVideoTracks().forEach(function(track){
+							console.log('closing video tracks', track);
+							track.stop();
+						});						
+					}
+				}
+			 }
+
 			/**
 			 * 
 			 * @param {*} message 
@@ -252,75 +406,9 @@
 			 * @param {*} message 
 			 */
 			function io_onLoginSuccess(data){
-
 				//creating our RTCPeerConnection object 
 				vm.logged_in_username = data.username;
-
-
-				//********************** 
-				//Starting a peer connection 
-				//********************** 		
-				webrtcService.getUserMedia({video:true, audio:true}, function(stream){
-
-					vm.webrtc_local_stream = stream; //set global stream
-
-					//initialize dom elements
-					vm.local_video = document.querySelector('#localVideo'); 
-					vm.remote_video = document.querySelector('#remoteVideo');
-
-					//VIDEO ONLY
-					webrtcService.getUserMedia({video:true, audio:false}, function(for_view_stream){
-						vm.local_video.src = window.URL.createObjectURL(for_view_stream);					
-					}, function(){});
-
-					vm.webrtc_connection = new webkitRTCPeerConnection(vm.CONFIG_WEBRTC); 
-					
-					// setup stream listening 
-					vm.webrtc_connection.addStream(stream);					
-				
-         			//when a remote user adds stream to the peer connection, we display it 
-					vm.webrtc_connection.onaddstream = function(e){
-
-						vm.webrtc_remote_stream = e.stream;
-						vm.remote_video.src = window.URL.createObjectURL(vm.webrtc_remote_stream); //add video on remote						
-
-						//Do audio merging here..
-
-						//mix 
-						var remote_audio_stream = new MediaStream([vm.webrtc_remote_stream.getTracks()[0]]); //get remote audio tracks	
-						var local_audio_stream = new MediaStream([vm.webrtc_local_stream.getTracks()[0]]); //get local audio tracks						
-
-						window.AudioContext = window.AudioContext || window.webkitAudioContext;
-						var audioContext = new AudioContext();
-						var local_media_stream_source = audioContext.createMediaStreamSource( local_audio_stream ),
-							remote_media_stream_source =  audioContext.createMediaStreamSource( remote_audio_stream );
-						
-						// Send the stream to MediaStream, which needs to be connected to PC
-						var media_stream_destination = audioContext.createMediaStreamDestination();
-							local_media_stream_source.connect(media_stream_destination);
-							remote_media_stream_source.connect(media_stream_destination);
-
-						//create mixed stream
-						vm.webrtc_mixed_stream = new MediaStream();
-						vm.webrtc_mixed_stream.addTrack(media_stream_destination.stream.getTracks()[0]); //mixed audio	
-						vm.webrtc_mixed_stream.addTrack(vm.webrtc_remote_stream.getTracks()[1]); //remote video
-
-					}
-
-					//setup ice handling
-					//when the browser finds an ice candidate we send it to another peer 
-					vm.webrtc_connection.onicecandidate = function (event) { 
-						if (event.candidate) { 
-							vm.io_sendMessageToTarget(vm.target_username, 'candidate', {
-								candidate : event.candidate
-							});
-						} 
-					}; 
-
-				}, function(error){
-					console.log('error', error);
-				});		
-				
+				// vm.startVideoInterview();
 			}
 
 			/**
@@ -355,18 +443,22 @@
 			 * @param {*} data 
 			 */
 			function io_incomingOffer(data){
-				vm.target_username = data.caller_username; //set caller as target
-				vm.webrtc_connection.setRemoteDescription(new RTCSessionDescription(data.offer)); 
-
-				vm.webrtc_connection.createAnswer(function(answer){
-					vm.webrtc_connection.setLocalDescription(answer);
-					vm.io_sendMessageToTarget(vm.target_username, 'answer', {
-						answer : answer
-					});
-				}, function(error){
-					console.log('error on answer');
+				vm.startVideoInterview(function(err){
+					if ( err ){
+						return alert(err);
+					}
+					vm.target_username = data.caller_username; //set caller as target
+					vm.webrtc_connection.setRemoteDescription(new RTCSessionDescription(data.offer)); 
+	
+					vm.webrtc_connection.createAnswer(function(answer){
+						vm.webrtc_connection.setLocalDescription(answer);
+						vm.io_sendMessageToTarget(vm.target_username, 'answer', {
+							answer : answer
+						});
+					}, function(error){
+						return alert(err);
+					});					
 				});
-
 			}
 
 			/**
@@ -375,7 +467,10 @@
 			 */
 			function io_incomingAnswer(answer){
 				console.log('io_incomingAnswer', answer);
-				vm.webrtc_connection.setRemoteDescription(new RTCSessionDescription(answer));
+				vm.webrtc_connection
+					.setRemoteDescription(new RTCSessionDescription(answer))
+					.then()
+					.catch(err=>console.log('answer exception', err));
 			}
 
 			/**
@@ -384,8 +479,18 @@
 			 */
 			function io_incomingCandidate(candidate){
 				console.log('io_incomingCandidate', candidate); 
-				vm.webrtc_connection.addIceCandidate(new RTCIceCandidate(candidate));
+				vm.webrtc_connection
+					.addIceCandidate(new RTCIceCandidate(candidate))
+					.then()
+					.catch(err=>console.log('candidate exception', err));
 			}	
+
+			/**
+			 * 
+			 */
+			function io_incomingHangup(){	
+				handleHangup();
+			}
 
 			/**
 			 * 
@@ -393,7 +498,7 @@
 			 */
 			function io_incomingOnLeave(left){
 				console.log('io_incomingOnLeave', left);
-				vm.handleLeave();
+				vm.handleHangup();
 			}
 
 			/**
@@ -401,7 +506,6 @@
 			 * @param {*} users_list 
 			 */
 			function io_updateUserToCallList(users_list){
-				console.log('users to call', users_list);
 				vm.users_list = users_list;
 			}
 			

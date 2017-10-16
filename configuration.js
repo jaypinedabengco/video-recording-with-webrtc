@@ -1,3 +1,6 @@
+//set base directory global
+global.__basedir = __dirname;
+
 /*
 Sample Configuration file
 */
@@ -10,11 +13,18 @@ const CONFIGURATION = {
         port: process.env.REDIS_PORT || 16379
     },
     video_transcoding: {
+        temporary_video_location : __basedir + '/tmp_recorded_videos/',
         aws: {
             access_key: process.env.AWS_ACCESS_KEY,
             secret_access_key: process.env.AWS_SECRET_ACCESS_KEY, 
             region: 'ap-southeast-1',
             pipeline_id: '1507540873164-vqf5mt', 
+            cloudfront: {
+                url: 'https://recorded-videos.qcapsstudylane.com', 
+                url_for_signed_cookies : 'https://recorded-videos.qcapsstudylane.com',
+                keypair_id : process.env.VIDEO_CF_PUBLIC_KEY,
+                private_key_string : process.env.VIDEO_CF_PRIVATE_KEY
+            },
             input_bucket: { //where videos to transcode are located
                 bucket_name: 'studylane-recorded-video.in', 
                 prefix: 'recorded_videos/sandbox/'
