@@ -1,4 +1,20 @@
-video {
-   width: 640px;
-   height: 360px;
+recorded-videos-list {
+    text-align: center;
+}
+
+recorded-videos-list .recorded-videos-list-header {
+    padding-bottom: 25px;
+}
+
+recorded-videos-list .video-player-container video {
+    width: 50%;
+}
+
+recorded-videos-list .recorded-videos-list-container > div {
+    display: inline-block;
+    margin: 10px;
+}
+
+recorded-videos-list .recorded-videos-list-container img {
+    width: 200px;
 }

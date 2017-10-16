@@ -22,7 +22,7 @@
 </div>
 
 <div id="callPage" class="call-page" ng-show="$ctrl.logged_in_username">
-    
+
     <video id="localVideo" autoplay></video>
     <video id="remoteVideo" autoplay></video>
     <div class="row text-center">
@@ -32,11 +32,29 @@
             <div>You are the {{$ctrl.is_caller ? 'Caller' : 'Callee'}}
         </h3>        
         <div class="col-md-12">
-            <ul ng-hide="$ctrl.target_username">
-                <li ng-repeat="username in $ctrl.users_list" ng-hide="username == $ctrl.logged_in_username">
-                    {{username}} <button class="btn-success btn" ng-click="$ctrl.connectTo(username)">Call</button>
-                </li>
-            </ul>
+
+            <div ng-show="$ctrl.declined_call_by_user">
+                Your call was declined by {{$ctrl.declined_call_by_user}}
+            </div>            
+
+            <div ng-hide="$ctrl.target_username || $ctrl.caller_username || $ctrl.calling_username">
+                <div><a href="/#!/simple-webrtc/recorded-videos" ng-click="$ctrl.leaveRoom()">View Recorded Videos</a></div>            
+                <ul>
+                    <li ng-repeat="username in $ctrl.users_list" ng-hide="username == $ctrl.logged_in_username">
+                        {{username}} <button class="btn-success btn" ng-click="$ctrl.callUser(username)">Call</button>
+                    </li>
+                </ul>                
+            </div>            
+            
+            <div ng-show="$ctrl.caller_username && !$ctrl.target_username">
+                You are being called by {{$ctrl.caller_username}} 
+                <button ng-click="$ctrl.answerCall()" class="btn-success btn">Answer</button>
+                <button ng-click="$ctrl.declineCall()" class="btn-danger btn">Decline</button>                
+            </div>
+
+            <div ng-show="$ctrl.calling_username && !$ctrl.target_username">
+                You are calling {{$ctrl.calling_username}}
+            </div>
             
             <button 
                 ng-show="$ctrl.target_username" 

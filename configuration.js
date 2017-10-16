@@ -1,9 +1,37 @@
 //set base directory global
 global.__basedir = __dirname;
 
-/*
-Sample Configuration file
-*/
+/***************************************
+    GET VIA ENVIRONMENT VARIABLES
+****************************************/
+
+//AWS
+const AWS_ACCESS_KEY = process.env.VT_AWS_ACCESS_KEY;
+const AWS_SECRET_KEY = process.env.VT_AWS_SECRET_ACCESS_KEY;
+
+//VIDEO TRANSCODING
+const VIDEO_TRANSCODING_PIPELINE_ID = process.env.VT_PIPELINE_ID; 
+
+//CLOUDFRONT
+const VIDEO_TRANSCODING_CLOUDFRONT_URL = process.env.VT_CLOUDFRONT_URL; 
+const VIDEO_TRANSCODING_CLOUDFRONT_FOR_SIGNED_COOKIES = process.env.VT_CLOUDFRONT_FOR_SIGNED_COOKIES;
+const VIDEO_CF_PUBLIC_KEY = process.env.VT_CF_PUBLIC_KEY;
+const VIDEO_CF_PRIVATE_KEY = process.env.VT_CF_PRIVATE_KEY;
+
+//INPUT
+const VIDEO_TRANSCODING_INPUT_BUCKET = process.env.VT_INPUT_BUCKET;
+const VIDEO_TRANSCODING_INPUT_BUCKET_REGION = process.env.VT_INPUT_BUCKET_REGION; 
+const VIDEO_TRANSCODING_INPUT_PREFIX = process.env.VT_INPUT_PREFIX || 'recorded_videos/';
+
+//OUTPUT
+const VIDEO_TRANSCODING_OUTPUT_PREFIX = process.env.VT_INPUT_PREFIX || 'transcoded_videos/';
+
+//REDIS
+const REDIS_HOST = process.env.VT_REDIS_HOST || '127.0.0.1';
+const REDIS_PORT = process.env.VT_REDIS_PORT || 16379;
+
+//SETUP CONFIGURATION
+
 const CONFIGURATION = {
     http_port: process.env.HTTP_PORT || 8081, 
     https_port: process.env.HTTPS_PORT || 8444,
@@ -15,22 +43,22 @@ const CONFIGURATION = {
     video_transcoding: {
         temporary_video_location : __basedir + '/tmp_recorded_videos/',
         aws: {
-            access_key: process.env.AWS_ACCESS_KEY,
-            secret_access_key: process.env.AWS_SECRET_ACCESS_KEY, 
-            region: 'ap-southeast-1',
-            pipeline_id: '1507540873164-vqf5mt', 
+            access_key: AWS_ACCESS_KEY,
+            secret_access_key: AWS_SECRET_KEY, 
+            region: VIDEO_TRANSCODING_INPUT_BUCKET_REGION,
+            pipeline_id: VIDEO_TRANSCODING_PIPELINE_ID, 
             cloudfront: {
-                url: 'https://recorded-videos.qcapsstudylane.com', 
-                url_for_signed_cookies : 'https://recorded-videos.qcapsstudylane.com',
-                keypair_id : process.env.VIDEO_CF_PUBLIC_KEY,
-                private_key_string : process.env.VIDEO_CF_PRIVATE_KEY
+                url: VIDEO_TRANSCODING_CLOUDFRONT_URL, 
+                url_for_signed_cookies : VIDEO_TRANSCODING_CLOUDFRONT_FOR_SIGNED_COOKIES,
+                keypair_id : VIDEO_CF_PUBLIC_KEY,
+                private_key_string : VIDEO_CF_PRIVATE_KEY
             },
             input_bucket: { //where videos to transcode are located
-                bucket_name: 'studylane-recorded-video.in', 
-                prefix: 'recorded_videos/sandbox/'
+                bucket_name: VIDEO_TRANSCODING_INPUT_BUCKET, 
+                prefix: VIDEO_TRANSCODING_INPUT_PREFIX
             }, 
             transcode_job_as_mpeg_dash: {
-                prefix: 'transcoded_videos/sandbox/',
+                prefix: VIDEO_TRANSCODING_OUTPUT_PREFIX,
                 outputs: {
                     video: {
                         key: 'video.mp4',

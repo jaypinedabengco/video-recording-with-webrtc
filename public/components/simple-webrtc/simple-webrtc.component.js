@@ -30,6 +30,10 @@
 			vm.target_username;
 			vm.is_caller = false;
 			vm.is_recording = false;
+			vm.is_call_start;
+			vm.declined_call_by_user;
+			vm.calling_username;
+			vm.caller_username;
 			
 			vm.io_signaling_server;		
 			vm.local_video; 
@@ -57,7 +61,7 @@
 			//functions
 			vm.connectToSignalingServer = connectToSignalingServer;
 			vm.login = login;
-			vm.connectTo = connectTo;
+			vm.callUser = callUser;
 			vm.hangup = hangup;
 			vm.toggleRecording = toggleRecording;
 			vm.io_sendMessageToTarget = io_sendMessageToTarget;
@@ -65,6 +69,9 @@
 			vm.startVideoInterview = startVideoInterview;
 			vm.endVideoInterview = endVideoInterview;
 			vm.closeStream = closeStream;
+			vm.answerCall = answerCall;
+			vm.declineCall = declineCall;
+			vm.leaveRoom = leaveRoom;
 
 			//socket events
 
@@ -92,12 +99,18 @@
 					vm.io_signaling_server.on('login.error', io_onLoginError);
 					vm.io_signaling_server.on('offer.success', io_onOfferSuccess);
 					vm.io_signaling_server.on('offer.error', io_onOfferError);
+					vm.io_signaling_server.on('incoming.call', io_incomingCall);
 					vm.io_signaling_server.on('incoming.offer', io_incomingOffer);
 					vm.io_signaling_server.on('incoming.answer', io_incomingAnswer);
 					vm.io_signaling_server.on('incoming.candidate', io_incomingCandidate);
 					vm.io_signaling_server.on('incoming.onhangup', io_incomingHangup);
 					vm.io_signaling_server.on('incoming.onleave', io_incomingOnLeave);
 					vm.io_signaling_server.on('available_users_for_call.update', io_updateUserToCallList);
+
+					vm.io_signaling_server.on('call.accepted', io_callAccepted);
+					vm.io_signaling_server.on('call.declined', io_callDeclined);
+
+					vm.io_signaling_server.on('callee.readyForCall', io_calleeReadyForCall);
 
 					resolve(vm.io_signaling_server);//end
 				});					
@@ -124,25 +137,50 @@
 
 			 /**
 			  * 
+			  */
+			 function answerCall(){
+				vm.declined_call_by_user = null;
+				vm.startVideoInterview(function(err){
+					if ( err ){
+						return alert("An error has occurred."); 
+					}
+					vm.io_sendMessageToTarget(vm.caller_username, 'acceptCall', {});
+					vm.io_sendMessageToTarget(vm.caller_username, 'calleeReadyForCall', {}); 
+				});
+			 }
+
+			 /**
+			  * 
+			  */
+			 function declineCall(){ 
+				vm.io_sendMessageToTarget(vm.caller_username, 'declineCall', {});
+				vm.caller_username = null;
+			 }
+
+			 /**
+			  * 
+			  */
+			 function leaveRoom(){
+				vm.io_sendMessageToTarget(null, 'leaveRoom', {});
+			 }
+
+			 /**
+			  * 
 			  * @param {*} target_username 
 			  */
-			 function connectTo(target_username){
-				 
+			 function callUser(target_username){
+				vm.declined_call_by_user = null;				
 				if (target_username.length > 0) {
+
+					vm.calling_username = target_username;
+				
 					vm.startVideoInterview(function(err){
 						if ( err ){
-							return alert("An error has occurred."); 
+							alert(err);
 						}
-						//make an offer 
-						vm.webrtc_connection.createOffer(function (offer) { 
-							vm.io_sendMessageToTarget(target_username, 'offer', {
-								offer : offer
-							}); 
-							vm.webrtc_connection.setLocalDescription(offer); 
-						}, function (error) { 
-							return alert("An error has occurred."); 
-						}); 
-					}); 
+						vm.io_sendMessageToTarget(target_username, 'call', {});
+					});
+
 				} 
 			 }
 
@@ -240,12 +278,16 @@
 			  */
 			 function startVideoInterview(callback){				
 				
+				console.log('starting', 'startVideoInterview');
 				//********************** 
 				//Starting a peer connection 
 				//********************** 	
 				vm.webrtc_connection = new webkitRTCPeerConnection(vm.CONFIG_WEBRTC); 
 				
 				webrtcService.getUserMedia({video:true, audio:true}, function(stream){
+
+					console.log('Im READY!');
+
 
 					vm.webrtc_local_stream = stream; //set global stream
 
@@ -309,24 +351,6 @@
 					return callback(err);
 				});	
 
-				// vm.webrtc_connection.onconnectionstatechange = function(event){
-				// 	console.log('state changed!');
-				// 	switch(webrtc_connection.connectionState) {
-				// 		case "connected":
-				// 		console.log('YOU HAVE CONNECT', pc.connectionState);
-				// 		  // The connection has become fully connected
-				// 		  break;
-				// 		case "disconnected":
-				// 		case "failed":
-				// 		console.log("DISCONNECT???", pc.connectionState)
-				// 		  // One or more transports has terminated unexpectedly or in an error
-				// 		  break;
-				// 		case "closed":
-				// 		console.log("Closed???", pc.connectionState)
-				// 		  // The connection has been closed
-				// 		  break;
-				// 	}
-				// }
 			 }
 
 			 /**
@@ -335,6 +359,13 @@
 			 function endVideoInterview(){
 				vm.remote_video.src = null;
 				vm.local_video.src = null;
+
+				//remove calling indicators				
+				vm.caller_username = null;
+				vm.calling_username = null;
+				vm.target_username = null;				
+				vm.is_call_start = false;
+				vm.is_caller = false;
 
 				//close streams
 				vm.closeStream(vm.local_audio_stream);
@@ -408,7 +439,6 @@
 			function io_onLoginSuccess(data){
 				//creating our RTCPeerConnection object 
 				vm.logged_in_username = data.username;
-				// vm.startVideoInterview();
 			}
 
 			/**
@@ -427,7 +457,6 @@
 			function io_onOfferSuccess(data){
 				console.log('offer success', data);
 				vm.is_caller = true;
-				vm.target_username = data.target_username;
 			}
 
 			/**
@@ -442,23 +471,25 @@
 			 * 
 			 * @param {*} data 
 			 */
+			function io_incomingCall(data){
+				vm.caller_username = data.caller_username;
+			}
+
+			/**
+			 * 
+			 * @param {*} data 
+			 */
 			function io_incomingOffer(data){
-				vm.startVideoInterview(function(err){
-					if ( err ){
-						return alert(err);
-					}
-					vm.target_username = data.caller_username; //set caller as target
-					vm.webrtc_connection.setRemoteDescription(new RTCSessionDescription(data.offer)); 
-	
-					vm.webrtc_connection.createAnswer(function(answer){
-						vm.webrtc_connection.setLocalDescription(answer);
-						vm.io_sendMessageToTarget(vm.target_username, 'answer', {
-							answer : answer
-						});
-					}, function(error){
-						return alert(err);
-					});					
-				});
+				vm.target_username = data.caller_username; //set caller as target
+				vm.webrtc_connection.setRemoteDescription(new RTCSessionDescription(data.offer)); 
+				vm.webrtc_connection.createAnswer(function(answer){
+					vm.webrtc_connection.setLocalDescription(answer);
+					vm.io_sendMessageToTarget(vm.target_username, 'answer', {
+						answer : answer
+					});
+				}, function(error){
+					return alert(err);
+				});					
 			}
 
 			/**
@@ -469,7 +500,10 @@
 				console.log('io_incomingAnswer', answer);
 				vm.webrtc_connection
 					.setRemoteDescription(new RTCSessionDescription(answer))
-					.then()
+					.then(() => {
+						//CONNECTED
+						vm.target_username = vm.calling_username;
+					})
 					.catch(err=>console.log('answer exception', err));
 			}
 
@@ -521,6 +555,36 @@
 				}
 				vm.io_signaling_server.emit(type, message);
 			}						
+
+			/**
+			 * 
+			 */
+			function io_callAccepted(data){
+
+			}
+
+			/**
+			 * 
+			 */
+			function io_callDeclined(data){
+				vm.declined_call_by_user = data.target_username;
+				endVideoInterview();
+			}
+
+			/**
+			 * 
+			 */
+			function io_calleeReadyForCall(data){
+				//make an offer 
+				vm.webrtc_connection.createOffer(function (offer) { 
+					vm.io_sendMessageToTarget(vm.calling_username, 'offer', {
+						offer : offer
+					}); 
+					vm.webrtc_connection.setLocalDescription(offer); 
+				}, function (error) { 
+					return alert("An error has occurred."); 
+				}); 
+			}
 			
 		}		
 

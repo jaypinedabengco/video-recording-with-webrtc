@@ -28,3 +28,7 @@ body {
     width: 500px; 
     height: 500px; 
  }
+
+ simple-webrtc #loginPage *{
+    padding-bottom:10px;
+ }

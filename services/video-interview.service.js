@@ -65,10 +65,10 @@ function stopRecording(video_recorder){
         video_recorder.is_video_processing_in_progress = true;
 
         //disable video processing
-        return Promise.all([
-            video_recorder.stopRecording() //close stream
-            // video_recorder.deleteRecordedFile() //delete recorded file
-        ]).then(resolve, reject);
+        // return Promise.all([
+        //     video_recorder.stopRecording() //close stream
+        //     // video_recorder.deleteRecordedFile() //delete recorded file
+        // ]).then(resolve, reject);
 
         //upload recorded video to s3
         video_recorder
@@ -84,7 +84,6 @@ function stopRecording(video_recorder){
                     .transcodeUploadedFileOnS3ToMPEGDash()
                     .then((transcode_info) => {
                         //save transcoded content on DB or something..
-                        console.log('transcode info', transcode_info);
 
                         //save 
                         return recorded_video_dao
@@ -189,7 +188,6 @@ function createCloudFrontSignedCookies(){
             // expireTime: expiration
         }
         var signed_cookies = cfsign.getSignedCookies(cloudfront_config.url_for_signed_cookies + '/*', options);
-        console.log(signed_cookies, cloudfront_config.url_for_signed_cookies, options);
         return resolve(signed_cookies);
     }).then().catch(err => {
         console.log(err);
@@ -210,10 +208,8 @@ function _signCloudFrontUrl(key_name){
         privateKeyString: cloudfront_config.private_key_string,
         expireTime: expiration
     }
-    console.log(options);
+    
     // Generating a signed URL
-    var start = new Date().getTime();
     var signed_url = cfsign.getSignedUrl(cloudfront_url, options);
-    console.log('end', start - new Date().getTime(), 'milliseconds');
     return signed_url; 
 }

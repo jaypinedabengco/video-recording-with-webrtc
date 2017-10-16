@@ -197,7 +197,6 @@ function VideoRecorder(data){
             };
     
             s3.upload(params, function(err, data) {
-                console.log('s3 upload', err, data);
 
                 //close first
                 file_read_stream.close();

@@ -49,9 +49,14 @@ module.exports = function(namespace_name, io){
         socket.on('candidate', onCandidate);
         socket.on('hangup', onHangup);
         socket.on('leave', onLeave);
+        socket.on('leaveRoom', onLeaveRoom);
         socket.on('startRecording', onStartRecording);
         socket.on('recordVideoChunks', onRecordVideoChunks);
         socket.on('stopRecording', onStopRecording);
+        socket.on('call', onCall);        
+        socket.on('acceptCall', onAcceptCall);
+        socket.on('declineCall', onDeclineCall);
+        socket.on('calleeReadyForCall', onCalleeReadyForCall);
         
         return onConnect();
 
@@ -148,7 +153,6 @@ module.exports = function(namespace_name, io){
          * @param {*} answer 
          */
         function onAnswer(data){
-            
             var target_username = data.target_username;
             var answer = data.answer;
             sendToTargetUser(target_username, 'incoming.answer', answer)
@@ -204,9 +208,18 @@ module.exports = function(namespace_name, io){
 
             sendToTargetUser(target_username, 'incoming.onleave', 'left')
                 .then(target_user =>  socket.emit('onleave.success', true), //send to self
-                    error => socket.emit('answer.error', error))
+                    error => socket.emit('onleave.error', error))
                 .then(simple_webrtc_user_service.deleteUser(socket.username))
                 .then(emit_updateUsersOnList());
+        }
+
+        /**
+         * 
+         */
+        function onLeaveRoom(){
+            simple_webrtc_user_service
+                .deleteUser(socket.username)
+                .then(emit_updateUsersOnList())
         }
 
         /**
@@ -244,6 +257,45 @@ module.exports = function(namespace_name, io){
 
         /**
          * 
+         * @param {*} data 
+         */
+        function onCall(data){
+            var target_username = data.target_username;            
+            sendToTargetUser(target_username, 'incoming.call', {caller_username : socket.logged_user_info.username});
+        }
+
+        /**
+         * 
+         * @param {*} data 
+         */
+        function onDeclineCall(data){
+            var target_username = data.target_username;    
+            console.log('declineCall', target_username);        
+            sendToTargetUser(target_username, 'call.declined', {target_username : socket.logged_user_info.username});
+        }
+
+        /**
+         * 
+         * @param {*} data 
+         */
+        function onAcceptCall(data){
+            var target_username = data.target_username;
+            console.log('acceptCall', target_username);
+            sendToTargetUser(target_username, 'call.accepted', {target_username : socket.logged_user_info.username});            
+        }
+
+        /**
+         * 
+         * @param {*} data 
+         */
+        function onCalleeReadyForCall(data){
+            var target_username = data.target_username;
+            console.log('calleReady', target_username);
+            sendToTargetUser(target_username, 'callee.readyForCall', {target_username : socket.logged_user_info.username});                        
+        }
+
+        /**
+         * 
          * @param {*} target_username 
          */
         function sendToTargetUser(target_username, emit_type, content){
@@ -251,8 +303,10 @@ module.exports = function(namespace_name, io){
                 .getUser(target_username)
                 .then(
                     target_user => { 
-                        nsp.to(target_user.socket_id).emit(emit_type, content) //send to target
-                        return target_user;
+                        if ( target_user ){
+                            nsp.to(target_user.socket_id).emit(emit_type, content) //send to target
+                            return target_user;    
+                        }
                     }
                 )
         }
