@@ -5,6 +5,7 @@ exports.authenticate = authenticate;
 /////
 
 // clearRedisAndInitializeUsers();
+initializeSampleUser();
 
 function clearRedisAndInitializeUsers(){
 
@@ -20,6 +21,14 @@ function clearRedisAndInitializeUsers(){
                 redis.client.set('user2', '2');
             }
         )
+}
+
+/**
+ * 
+ */
+function initializeSampleUser(){
+    redis.client.set('user1', '1');    
+    redis.client.set('user2', '2');    
 }
 
 
