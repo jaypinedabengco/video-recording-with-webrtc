@@ -84,6 +84,4 @@ const CONFIGURATION = {
     }
 };
 
-console.log(CONFIGURATION);
-
 module.exports = CONFIGURATION;

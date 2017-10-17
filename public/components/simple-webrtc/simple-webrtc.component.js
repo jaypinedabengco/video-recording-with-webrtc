@@ -348,7 +348,7 @@
 				}, function(error){
 					console.log('error', error);
 					alert('Unable to access media devices, (Video & Audio), please check if you devices if working');
-					return callback(err);
+					return callback(error);
 				});	
 
 			 }
