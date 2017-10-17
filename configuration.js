@@ -27,8 +27,8 @@ const VIDEO_TRANSCODING_INPUT_PREFIX = process.env.VT_INPUT_PREFIX || 'recorded_
 const VIDEO_TRANSCODING_OUTPUT_PREFIX = process.env.VT_OUTPUT_PREFIX || 'transcoded_videos/';
 
 //REDIS
-const REDIS_HOST = process.env.VT_REDIS_HOST || '127.0.0.1';
-const REDIS_PORT = process.env.VT_REDIS_PORT || 16379;
+const REDIS_HOST = process.env.VT_REDIS_HOST || 'redis';
+const REDIS_PORT = process.env.VT_REDIS_PORT || 6379;
 
 //SETUP CONFIGURATION
 
@@ -37,8 +37,8 @@ const CONFIGURATION = {
     https_port: process.env.HTTPS_PORT || 8444,
     jwt_secret_key: process.env.JWT_SECRET_KEY || 'ABCD123', 
     redis: {
-        host: process.env.REDIS_HOST || '127.0.0.1', 
-        port: process.env.REDIS_PORT || 16379
+        host: REDIS_HOST, 
+        port: REDIS_PORT
     },
     video_transcoding: {
         temporary_video_location : __basedir + '/tmp_recorded_videos/',
@@ -83,5 +83,7 @@ const CONFIGURATION = {
         }
     }
 };
+
+console.log(CONFIGURATION);
 
 module.exports = CONFIGURATION;

@@ -1,3 +1,3 @@
 export CSTM_DOCKER_IMAGE_NAME=video-recording-with-webrtc
 export CSTM_DOCKER_CONTAINER_NAME=video-recording-img
-export CSTOM_DOCKER_CONTAINER_PORT=41966
+export CSTM_DOCKER_CONTAINER_PORT=41966

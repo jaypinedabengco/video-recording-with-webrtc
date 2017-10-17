@@ -23,7 +23,15 @@ module.exports.client = client;
  * 
  */
 function createClient(){
-    return redis.createClient(config.redis.port, config.redis.host);
+    
+    //if specific redis provided
+    if ( config.redis.port &&  config.redis.host){
+        return redis.createClient(config.redis.port, config.redis.host);
+    }
+
+    //else, use local
+    return redis.createClient();
+    
 }
 
  /**
