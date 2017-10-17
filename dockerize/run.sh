@@ -2,7 +2,7 @@
 
 echo "RUNNING...." &&
 
-sh ./setenv &&
+source ./dockerize/setenv.sh &&
 docker run --restart always \
 -h `hostname` \
 -e "VT_AWS_ACCESS_KEY_ID=$VT_AWS_ACCESS_KEY_ID" -e "VT_AWS_SECRET_ACCESS_KEY=$VT_AWS_SECRET_ACCESS_KEY" \
@@ -11,6 +11,7 @@ docker run --restart always \
 -e "VT_INPUT_BUCKET=$VT_INPUT_BUCKET" -e "VT_INPUT_BUCKET_REGION=$VT_INPUT_BUCKET_REGION" \
 -e "VT_INPUT_PREFIX=$VT_INPUT_PREFIX" -e "VT_OUTPUT_PREFIX=$VT_OUTPUT_PREFIX" \
 -e "VT_CF_PUBLIC_KEY=$VT_CF_PUBLIC_KEY" -e "VT_CF_PRIVATE_KEY=$VT_CF_PRIVATE_KEY" \
+-e "VT_REDIS_HOST=$VT_REDIS_HOST" -e "VT_REDIS_PORT=$VT_REDIS_PORT" \
 -p $CSTOM_DOCKER_CONTAINER_PORT:8081 -d --name $CSTM_DOCKER_CONTAINER_NAME $CSTM_DOCKER_IMAGE_NAME &&
 
 echo "DONE you can test it by running ' curl -i localhost:41965/api/healthcheck '" && 

@@ -18,6 +18,9 @@
 
 FROM node:6.11.2
 
+# Install Bower
+RUN npm install -g bower
+
 # Create app directory
 RUN mkdir -p /usr/src/app
 WORKDIR /usr/src/app
@@ -25,6 +28,11 @@ WORKDIR /usr/src/app
 # Install app dependencies
 COPY package.json /usr/src/app/
 RUN npm install
+
+# Install bower dependencies
+COPY bower.json /usr/src/app/
+COPY .bowerrc /usr/src/app/
+RUN bower install
 
 # Bundle app source
 COPY . /usr/src/app
