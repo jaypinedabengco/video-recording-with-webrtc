@@ -12,7 +12,7 @@ Sample Video Recording using WebRTC
   
 ## SETUP 
 
-  * SET the following on your environment variable 
+  * SET the following on your system environment 
     * VT_AWS_ACCESS_KEY_ID
     * VT_AWS_SECRET_ACCESS_KEY
     * VT_PIPELINE_ID
