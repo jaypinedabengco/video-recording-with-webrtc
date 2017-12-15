@@ -1,5 +1,5 @@
-'use strict';
 (function(){
+'use strict';
 
     angular
         .module('app.dataservice.module')
@@ -13,7 +13,7 @@
 
 		var services = {	
 			login : login
-		}
+		};
 
 		return services;
 
@@ -32,7 +32,6 @@
                     return result.data;
                 });
 		}
-
-	};	     
+	} 
     
 })();

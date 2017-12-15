@@ -31,7 +31,7 @@ function addUserInformation(socket_id, user_info){
             .hmsetAsync(
                 util.format(USER_INFO, socket_id),
                 user_info
-            ).then(()=>{return user_info}); //return user info with socket id
+            ).then(()=> user_info); //return user info with socket id
 }
 
 /**

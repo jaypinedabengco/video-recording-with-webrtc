@@ -1,5 +1,5 @@
-'use strict';
 (function(){
+'use strict';
 
     angular
         .module('app.dataservice.module')
@@ -14,7 +14,7 @@
 		var services = {	
 			post : post,
 			get : get
-		}
+		};
 
 		return services;
 
@@ -72,7 +72,6 @@
                     return $q.reject(error.data);
                 });
 		}	
-		
-	};	     
+	}
     
 })();

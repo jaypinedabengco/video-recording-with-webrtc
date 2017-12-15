@@ -1,6 +1,6 @@
-'use strict';
 (function(){
-
+'use strict';
+    
     angular
         .module('app.dataservice.module')
         .service('app.recorded-videos.dataservice', DataService);
@@ -14,7 +14,7 @@
 		var services = {	
             getRecordedVideos : getRecordedVideos,
             getCFSignedURLCookies : getCFSignedURLCookies
-		}
+		};
 
 		return services;
 
@@ -41,7 +41,6 @@
                     return result.data;
                 });            
         }
-
-	};	     
+	}	     
     
 })();
