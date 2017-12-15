@@ -14,14 +14,14 @@ jobs:
       # NPM vendors
       - restore_cache: 
           keys: 
-            - npm-cache-{{ checksum "package.json" }}
-            - npm-cache       
+            - npm-cache-1-{{ checksum "package.json" }}
+            - npm-cache-1       
       - run: 
           name: Install Node
           command: |
             npm install     
       - save_cache: 
-          key: npm-cache-{{ checksum "package.json" }}
+          key: npm-cache-1-{{ checksum "package.json" }}
           paths: 
             - node_modules
 
@@ -29,14 +29,14 @@ jobs:
       # bower vendors            
       - restore_cache: 
           keys: 
-            - bower-cache-{{ checksum "bower.json" }}
+            - bower-cache-1-{{ checksum "bower.json" }}
             - bower-cache         
       - run: 
           name: Install Bower
           command: |
             bower install    
       - save_cache: 
-          key: bower-cache-{{ checksum "bower.json" }}
+          key: bower-cache-1-{{ checksum "bower.json" }}
           paths: 
             - public/bower_components
            
