@@ -8,6 +8,4 @@ jobs:
       - run: 
           name: Install Node & Bower Dependencies
           command: |
-            npm install 
-            npm install bower 
-            bower install 
+            npm install
