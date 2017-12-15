@@ -7,10 +7,10 @@ jobs:
       - checkout
       - restore_cache: 
           keys: 
-            - npm-{{ checksum "package.json" }}
-            - npm-
-            - bower-{{ checksum "bower.json" }}
-            - bower-
+            - npm-{{ checksum "package.json" }} 
+            - npm- 
+            - bower-{{ checksum "bower.json" }} 
+            - bower- 
       - run: 
           name: Add application dependencies
           command: |
