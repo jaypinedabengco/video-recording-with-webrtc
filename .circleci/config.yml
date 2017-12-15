@@ -6,6 +6,14 @@ jobs:
     steps:
       - checkout
       - run: 
-          name: Install Node & Bower Dependencies
+          name: Add application dependencies
           command: |
-            npm install
+            npm install -g bower
+      - run: 
+          name: Install Node
+          command: |
+            npm install      
+      - run: 
+          name: Install Bower
+          command: |
+            bower install               
