@@ -23,7 +23,7 @@ jobs:
       - save_cache: 
           key: npm-cache-{{ checksum "package.json" }}
           paths: 
-            - vendor/npm
+            - node_modules
 
       # Install & Cache 
       # bower vendors            
@@ -38,5 +38,5 @@ jobs:
       - save_cache: 
           key: bower-cache-{{ checksum "bower.json" }}
           paths: 
-            - vendor/bower
+            - public/bower_components
            
