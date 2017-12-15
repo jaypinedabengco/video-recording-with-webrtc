@@ -17,7 +17,7 @@
 #######
 
 FROM node:6.11.2 
-
+ 
 # Install Bower
 RUN npm install -g bower
 
