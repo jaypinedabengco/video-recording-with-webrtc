@@ -1,0 +1,12 @@
+version: 2
+jobs:
+  build:
+    docker:
+      - image: node:6.11.2
+    steps:
+      - checkout
+      - run: 
+          name: Install Node & Bower Dependencies
+          command: |
+            npm install 
+            bower install 
