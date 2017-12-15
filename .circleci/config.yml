@@ -5,6 +5,12 @@ jobs:
       - image: node:6.11.2
     steps:
       - checkout
+      - restore_cache: 
+          keys: 
+            - npm-{{ checksum "package.json" }}
+            - npm-
+            - bower-{{ checksum "bower.json" }}
+            - bower-
       - run: 
           name: Add application dependencies
           command: |
@@ -16,4 +22,11 @@ jobs:
       - run: 
           name: Install Bower
           command: |
-            bower install               
+            bower install    
+      - restore_cache: 
+        keys:
+            - npm-{{ checksum "package.json" }}
+            - npm-
+            - bower-{{ checksum "bower.json" }}
+            - bower- 
+           
