@@ -5,6 +5,9 @@ jobs:
       - image: node:6.11.2
     steps:
       - checkout
+      - run: Add application dependecies
+        command: |
+          npm install bower 
       - run: 
           name: Install Node & Bower Dependencies
           command: |
