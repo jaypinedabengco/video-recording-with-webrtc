@@ -5,28 +5,38 @@ jobs:
       - image: node:6.11.2
     steps:
       - checkout
-      - restore_cache: 
-          keys: 
-            - npm-{{ checksum "package.json" }} 
-            - npm- 
-            - bower-{{ checksum "bower.json" }} 
-            - bower- 
       - run: 
           name: Add application dependencies
           command: |
             npm install -g bower
+
+      # Install & Cache 
+      # NPM vendors
+      - restore_cache: 
+          keys: 
+            - npm-cache-{{ checksum "package.json" }}
+            - npm-cache       
       - run: 
           name: Install Node
           command: |
-            npm install      
+            npm install     
+      - save_cache: 
+          key: npm-cache-{{ checksum "package.json" }}
+          paths: 
+            - vendor/npm
+
+      # Install & Cache 
+      # bower vendors            
+      - restore_cache: 
+          keys: 
+            - bower-cache-{{ checksum "bower.json" }}
+            - bower-cache         
       - run: 
           name: Install Bower
           command: |
             bower install    
-      - restore_cache: 
-          keys:
-            - npm-{{ checksum "package.json" }}
-            - npm-
-            - bower-{{ checksum "bower.json" }}
-            - bower- 
+      - save_cache: 
+          key: bower-cache-{{ checksum "bower.json" }}
+          paths: 
+            - vendor/bower
            
