@@ -1,7 +1,7 @@
 const healthcheck = require('./../services/healthcheck.service');
 const chai = require('chai'), 
       chaiAsPromised = require('chai-as-promised');
-x
+
 //setup chai
 chai.use(chaiAsPromised);
 const expect = chai.expect;
