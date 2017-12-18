@@ -51,7 +51,8 @@ jobs:
           command: | 
             pm2 start bin/www  --name "webrtc-app" 
 
+      # Check Health
       - run: 
-          name: Check Logs
+          name: Check Health
           command: |
-            pm2 logs webrtc-app
+            curl -X GET http://localhost:8081/api/healthcheck
