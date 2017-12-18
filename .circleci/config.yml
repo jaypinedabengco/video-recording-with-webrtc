@@ -49,7 +49,9 @@ jobs:
       - run:
           name: Start Application
           command: | 
-            pm2 start bin/www  --name "webrtc-app" 
+            npm start
+            # pm2 start bin/www  --name "webrtc-app" 
+          background: true
 
       # Check Health
       - run: 
