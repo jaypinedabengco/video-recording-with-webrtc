@@ -50,8 +50,8 @@ jobs:
 
       # Start the Application
       - run:
-          name: Start Application
-          command: npm run dev 
+          name: Test Application
+          command: npm test 
           # background: true
       # Check Health
       # - run: 
