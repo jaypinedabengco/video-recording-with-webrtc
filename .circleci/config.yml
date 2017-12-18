@@ -52,10 +52,10 @@ jobs:
       - run:
           name: Start Application
           command: npm run dev 
-          background: true
+          # background: true
       # Check Health
-      - run: 
-          name: Check Health
-          command: |
-            curl --connect-timeout 2.37 --max-time 5.00 http://127.0.0.1:8081/api/healthcheck 
+      # - run: 
+      #     name: Check Health
+      #     command: |
+      #       curl --connect-timeout 2.37 --max-time 5.00 http://127.0.0.1:8081/api/healthcheck 
             
