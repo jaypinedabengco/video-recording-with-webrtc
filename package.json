@@ -6,7 +6,7 @@
     "start": "node ./bin/www",
     "dev": "DEBUG=video-recording-with-webrtc:server ./node_modules/.bin/nodemon --config nodemon.json ./bin/www",
     "dev-second-server": "HTTP_PORT=8082 HTTPS_PORT=8445 DEBUG=video-recording-with-webrtc:server ./node_modules/.bin/nodemon --config nodemon.json ./bin/www",
-    "test": "mocha --require co-mocha tests/**/**.spec.js"
+    "test": "mocha --reporter mocha-multi-reporters --reporter-options configFile=mocha-config.json --require co-mocha tests/**/**.spec.js --exit"
   },
   "dependencies": {
     "aws-cloudfront-sign": "2.2.0",
@@ -30,9 +30,10 @@
   },
   "devDependencies": {
     "chai": "4.1.2",
-    "chai-as-promised": "^7.1.1",
+    "chai-as-promised": "7.1.1",
     "co-mocha": "1.2.1",
     "mocha": "4.0.1",
+    "mocha-multi-reporters": "1.1.7",
     "nodemon": "1.11.0"
   }
 }

@@ -1,3 +1,3 @@
 {
-    "ignore": ["node_modules","public/*", "*.sh", "*.json", "*.log"]
+    "ignore": ["node_modules","public/*", "*.sh", "*.json", "*.log", "test-results.xml"]
   }
