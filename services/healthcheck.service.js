@@ -37,7 +37,7 @@ function getRedisStatus(){
     return redis
         .get('test')
         .then(() => {
-            redis_status.status = 1;
+            redis_status.status = 0;
             return redis_status;
         }).catch(err => {
             redis_status.error = err;
