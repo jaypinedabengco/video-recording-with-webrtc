@@ -47,9 +47,8 @@ jobs:
           key: bower-cache-1-{{ checksum "bower.json" }}
           paths: 
             - public/bower_components
-
     test: 
-        post: 
+        override: 
           - npm test
       # Test Application
       # - run:
