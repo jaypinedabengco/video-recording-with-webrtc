@@ -48,9 +48,9 @@ jobs:
           paths: 
             - public/bower_components
 
-      - test: 
-          post: 
-            - npm test
+    test: 
+        post: 
+          - npm test
       # Test Application
       # - run:
       #     name: Test Application
