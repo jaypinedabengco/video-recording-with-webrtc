@@ -79,9 +79,9 @@ workflows:
     jobs: 
       - build
       - test: 
-        requires: 
+          requires: 
             - build 
-        filters:
-          branches: #SET the only branches that are allowed for build
-            only:
+          filters:
+            branches: #SET the only branches that are allowed for build
+              only:
                 - development
