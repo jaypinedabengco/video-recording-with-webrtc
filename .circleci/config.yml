@@ -55,4 +55,4 @@ jobs:
       - run: 
           name: Check Health
           command: |
-            curl --connect-timeout 2.37 --max-time 5.00 http://localhost:8081/api/healthcheck
+            curl --connect-timeout 2.37 --max-time 5.00 http://127.0.0.1:8081/api/healthcheck
