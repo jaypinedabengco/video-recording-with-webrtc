@@ -1,9 +1,6 @@
 version: 2
 jobs:
   build:
-    branches: #SET the only branches that are allowed for build
-      only:
-        - development
     docker:
       - image: node:6.11.2 #primary container
         environment: 
@@ -74,3 +71,17 @@ jobs:
       - store_artifacts: 
           path: test-results.xml
           prefix: tests
+
+#ADD workflow      
+workflows: 
+    version: 2
+      build_and_test: 
+        jobs: 
+          - build
+          - test: 
+            requires: 
+               - build 
+            filters:
+              branches: #SET the only branches that are allowed for build
+                only:
+                   - development
