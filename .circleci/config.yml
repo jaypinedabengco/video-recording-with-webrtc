@@ -52,7 +52,7 @@ jobs:
       - run:
           name: Start Application
           command: | 
-            pm2 start bin/www  --name "webrtc-app" 
+            npm start 
             curl --connect-timeout 2.37 --max-time 5.00 http://127.0.0.1:8081/api/healthcheck 
       # # Check Health
       # - run: 
