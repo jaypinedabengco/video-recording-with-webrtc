@@ -51,8 +51,7 @@ jobs:
       # Start the Application
       - run:
           name: Start Application
-          command: | 
-            npm run dev 
+          command: npm run dev 
           background: true
       # Check Health
       - run: 
