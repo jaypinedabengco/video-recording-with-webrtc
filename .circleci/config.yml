@@ -1,7 +1,7 @@
 version: 2
 jobs:
   build:
-    branches: 
+    branches: #SET the only branches that are allowed for build
       only:
         - development
     docker:
