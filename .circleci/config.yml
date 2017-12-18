@@ -52,7 +52,7 @@ jobs:
       - run:
           name: Test Application
           command: npm test 
-          # background: true
+          background: true
       # Check Health
       # - run: 
       #     name: Check Health
