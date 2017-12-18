@@ -1,6 +1,10 @@
 version: 2
 jobs:
   build:
+    filters:
+      branches: #SET the only branches that are allowed for build
+        only:
+          - development  
     docker:
       - image: node:6.11.2 #primary container
         environment: 
@@ -45,27 +49,6 @@ jobs:
           key: bower-cache-1-{{ checksum "bower.json" }}
           paths: 
             - public/bower_components
-
-      #Test Application
-      # - run:
-      #     name: Test Application
-      #     command: | 
-      #       npm test 
-      # Check Health
-      # - run: 
-      #     name: Check Health
-      #     command: |
-      #       curl --connect-timeout 2.37 --max-time 5.00 http://127.0.0.1:8081/api/healthcheck 
-
-  test: 
-    docker:
-      - image: node:6.11.2 #primary container
-        environment: 
-          VT_REDIS_HOST: 127.0.0.1
-          VT_REDIS_PORT: 6379
-      - image: redis:3.2.4 #add redis image     
-    steps: 
-      - checkout
       - run: 
           name: Test
           command: npm test
@@ -75,16 +58,34 @@ jobs:
       - store_test_results:
           path: test-results.xml
 
-#ADD workflow      
-workflows: 
-  version: 2
-  build_and_test: 
-    jobs: 
-      - build
-      - test: 
-          requires: 
-            - build 
-          filters:
-            branches: #SET the only branches that are allowed for build
-              only:
-                - development
+  # test: 
+  #   docker:
+  #     - image: node:6.11.2 #primary container
+  #       environment: 
+  #         VT_REDIS_HOST: 127.0.0.1
+  #         VT_REDIS_PORT: 6379
+  #     - image: redis:3.2.4 #add redis image     
+  #   steps: 
+  #     - checkout
+  #     - run: 
+  #         name: Test
+  #         command: npm test
+  #     - store_artifacts: 
+  #         path: test-results.xml
+  #         prefix: tests
+  #     - store_test_results:
+  #         path: test-results.xml
+
+# #ADD workflow      
+# workflows: 
+#   version: 2
+#   build_and_test: 
+#     jobs: 
+#       - build
+#       - test: 
+#           requires: 
+#             - build 
+#           filters:
+#             branches: #SET the only branches that are allowed for build
+#               only:
+#                 - development
