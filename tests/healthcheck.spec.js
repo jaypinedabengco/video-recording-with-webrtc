@@ -22,7 +22,7 @@ describe('healthcheck service', () => {
     
     it('should have no error', () => {
       return healthcheck.checkHealth()
-        .then(() => expect(true).to.be.false)
+        .then(() => expect(true).to.be.true)
         .catch((err) => expect(false, err).to.be.true);
     });
 
