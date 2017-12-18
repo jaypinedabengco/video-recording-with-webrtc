@@ -60,3 +60,6 @@ typings/
 
 # recorded videos
 tmp_recorded_videos/
+
+# test
+test-results.xml
