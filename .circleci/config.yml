@@ -14,6 +14,7 @@ jobs:
           command: |
             npm install -g bower
             npm install pm2 -g 
+            npm install -g mocha
 
       # Install & Cache 
       # NPM vendors
