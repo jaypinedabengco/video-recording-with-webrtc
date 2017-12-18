@@ -1,6 +1,6 @@
 var express = require('express');
 var router = express.Router();
-var util = require('util')
+var util = require('util');
 
 var service_redis_sample = require('./../services/sample.redis.service');
 
@@ -27,8 +27,8 @@ function getDogAny(req, res, next){
     service_redis_sample
         .getDogAny()
         .then(
-            (dogs) => {return res.status(200).json(dogs)}, 
-            (err) => {return res.status(303).json(err)}
+            (dogs) => {return res.status(200).json(dogs);}, 
+            (err) => {return res.status(303).json(err);}
         );
 }
 
