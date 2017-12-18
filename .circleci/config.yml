@@ -1,8 +1,11 @@
 version: 2
 jobs:
   build:
+    branches: 
+      only:
+        - development
     docker:
-      - image: node:6.11.2
+      - image: node:6.11.2 #primary container
         environment: 
           VT_REDIS_HOST: 127.0.0.1
           VT_REDIS_PORT: 6379
@@ -49,10 +52,7 @@ jobs:
       - run:
           name: Start Application
           command: | 
-            npm start
-            # pm2 start bin/www  --name "webrtc-app" 
-          background: true
-
+            pm2 start bin/www  --name "webrtc-app" 
       # Check Health
       - run: 
           name: Check Health
