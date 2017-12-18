@@ -48,11 +48,15 @@ jobs:
           paths: 
             - public/bower_components
 
-      # Start the Application
-      - run:
-          name: Test Application
-          command: npm test 
-          background: true
+      - test: 
+          post: 
+            - npm test
+      # Test Application
+      # - run:
+      #     name: Test Application
+      #     command: | 
+      #       npm test 
+      #     background: true
       # Check Health
       # - run: 
       #     name: Check Health
