@@ -44,8 +44,14 @@ jobs:
           key: bower-cache-1-{{ checksum "bower.json" }}
           paths: 
             - public/bower_components
-      # Start NPM 
+
+      # Start the Application
       - run:
           name: Start Application
           command: | 
-            npm start
+            pm2 start bin/www  --name "webrtc-app" 
+
+      - run: 
+          name: Check Logs
+          command: |
+            pm2 logs webrtc-app

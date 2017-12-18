@@ -1,4 +1,5 @@
-var redis = require('./../providers/redis');
+var redis = require('./../providers/redis'), 
+    config = require('./../configuration');
 
 exports.checkHealth = checkHealth;
 exports.getRedisStatus = getRedisStatus;
@@ -13,7 +14,7 @@ function checkHealth(){
         const status_container = {};
         
         //get statuses
-        
+
         getRedisStatus() //get redis status
             .then((redis_status) => {
                 status_container.redis = redis_status;
@@ -28,8 +29,11 @@ function checkHealth(){
  */
 function getRedisStatus(){
     const redis_status = {
+        host : config.redis.host, 
+        port: config.redis.port,
         status : 0
     };
+    
     return redis
         .get('test')
         .then(() => {
