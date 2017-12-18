@@ -13,12 +13,24 @@ jobs:
       - image: redis:3.2.4 #add redis image
     steps:
       - checkout
+
+      # Install & Cache 
+      # Global 
+      - restore_cache: 
+          keys: 
+            - global-cache-1-{{ checksum ".circleci/config.yml" }}
+            - global-cache-1        
       - run: 
           name: Add application dependencies
           command: |
             npm install -g bower
+      - save_cache: 
+          key: global-cache-1-{{ checksum ".circleci/config.yml" }}
+          paths: 
+            - /usr/local/lib/node_modules
+            - /usr/local/bin
 
-      # Install & Cache 
+      # Install & Cache             
       # NPM vendors
       - restore_cache: 
           keys: 
