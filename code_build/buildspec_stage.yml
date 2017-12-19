@@ -1,0 +1,19 @@
+version: 0.2
+            
+phases:
+  install:
+    commands:
+      - echo Entered the install phase...
+      - curl -sL https://deb.nodesource.com/setup_6.x | sudo -E bash -
+      - apt-get install -y nodejs 
+      - npm install -g bower
+  pre_build:
+    commands:
+      - npm install
+      - bower install
+  build:
+    commands:
+      - npm test
+  post_build:
+    commands:
+      - npm start

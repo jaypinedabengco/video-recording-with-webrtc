@@ -5,6 +5,7 @@ jobs:
       branches: #SET the only branches that are allowed for build
         only:
           - development  
+          - master
     docker:
       - image: node:6.11.2 #primary container
         environment: 
@@ -61,7 +62,8 @@ jobs:
             - public/bower_components
       - run: 
           name: Test
-          command: npm test
+          command: npm test   
+
       # - store_artifacts: 
       #     path: test-results.xml
       #     prefix: tests
