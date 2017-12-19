@@ -16,7 +16,7 @@ jobs:
       - checkout
 
       # Install & Cache 
-      # Global 
+      # Global  
       - restore_cache: 
           keys: 
             - global-cache-1-{{ checksum ".circleci/config.yml" }}
