@@ -17,6 +17,3 @@ phases:
   build:
     commands:
       - npm test
-  post_build:
-    commands:
-      - npm start
