@@ -1,4 +1,4 @@
 #!/bin/bash
 
 #Start PM2
-# pm2 start bin/www
+pm2 start bin/www
