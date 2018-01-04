@@ -27,12 +27,6 @@ jobs:
           name: Add application dependencies
           command: |
             npm install -g bower
-            curl "https://bootstrap.pypa.io/get-pip.py" -o "get-pip.py"
-            python get-pip.py --user 
-            ls -a ~
-            echo "export PATH=~/.local/bin:$PATH" >> ~/.bash_profile
-            source ~/.bash_profile
-            pip --version
       - save_cache: 
           key: global-cache-1-{{ checksum ".circleci/config.yml" }}
           paths: 
@@ -71,6 +65,16 @@ jobs:
       - run: 
           name: Test
           command: npm test   
+      - run:
+          name: Add Deployment Applications
+          command: |
+            curl "https://bootstrap.pypa.io/get-pip.py" -o "get-pip.py"
+            python get-pip.py --user 
+            ls -a ~
+            echo "export PATH=~/.local/bin:$PATH" >> ~/.bash_profile
+            source ~/.bash_profile
+            pip --version
+            pip install awscli --upgrade --user            
       - run: 
           name: Code Deploy - package
           command: |
