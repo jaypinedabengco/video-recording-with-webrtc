@@ -74,11 +74,19 @@ jobs:
       - run: 
           name: Add Environment Variables for Code Deploy
           command: |
-            echo 'export CODE_DEPLOY_FILENAME=$(date +%F-%T)/code_file.zip' >> $BASH_ENV
+            echo 'export CODE_DEPLOY_FILENAME=$(date +%F-%T)/packaged_application.zip' >> $BASH_ENV
       - run: 
-          name: Code Deploy - package
+          name: Code Deploy - Package Application
           command: |
             aws deploy push \
               --application-name $AWS_CODE_DEPLOY_APPLICATION_NAME \
               --s3-location s3://$AWS_CODE_DEPLOY_S3_BUCKET/$CODE_DEPLOY_FILENAME \
               --ignore-hidden-files
+      - run: 
+          name: Code Deploy - Deploy Application
+          command: |
+            aws deploy create-deployment \
+              --application-name $AWS_CODE_DEPLOY_APPLICATION_NAME \
+              --deployment-config-name CodeDeployDefault.OneAtATime \
+              --deployment-group-name $AWS_CODE_DEPLOY_DEPLOYMENT_GROUP_NAME \
+              --s3-location bucket=$AWS_CODE_DEPLOY_S3_BUCKET,bundleType=zip,key=$CODE_DEPLOY_FILENAME          
