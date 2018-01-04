@@ -69,7 +69,7 @@ jobs:
           name: Add Code Deploy Dependencies 
           command: |
             apt-get -y update
-            apt-get -y python-pip python-dev build-essential 
+            apt-get -y install python-pip python-dev build-essential 
             pip install --upgrade pip
             pip install --upgrade virtualenv
             pip install awscli --upgrade
