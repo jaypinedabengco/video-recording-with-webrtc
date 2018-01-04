@@ -27,8 +27,8 @@ jobs:
           name: Add application dependencies
           command: |
             npm install -g bower
-            apt-get -y update
-            apt-get -y install awscli
+            apt-get -y update --only-upgrade awscli
+            apt-get -y install 
       - save_cache: 
           key: global-cache-1-{{ checksum ".circleci/config.yml" }}
           paths: 
@@ -69,7 +69,7 @@ jobs:
           command: npm test   
       - run: 
           name: Code Deploy - package
-          command: 
+          command: |
             aws --version
             aws deploy push \
               --application-name video-interview-POC-Deploy \
