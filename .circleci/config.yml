@@ -8,11 +8,11 @@ jobs:
           - master
     docker:
       - image: node:6.11.2 #primary container
-      - image: redis:3.2.4 #add redis image
         environment: 
           VT_REDIS_HOST: 127.0.0.1
           VT_REDIS_PORT: 6379
-          CODE_DEPLOY_FILENAME: 'code-deploy-bt-{{ epoch }}-bn-{{ .BuildNum }}-branch-{{ .Branch }}/Deploy_Build.zip'      
+          CODE_DEPLOY_FILENAME: 'code-deploy-bt-{{ epoch }}-bn-{{ .BuildNum }}-branch-{{ .Branch }}/Deploy_Build.zip'            
+      - image: redis:3.2.4 #add redis image
     steps:
       - checkout
 
