@@ -27,8 +27,8 @@ jobs:
           name: Add application dependencies
           command: |
             npm install -g bower
-            apt-get update
-            apt-get -y install awscli
+            apt-get -y update
+            apt-get -y awscli
       - save_cache: 
           key: global-cache-1-{{ checksum ".circleci/config.yml" }}
           paths: 
@@ -70,6 +70,7 @@ jobs:
       - run: 
           name: Code Deploy - package
           command: 
+            aws --version
             aws deploy push \
               --application-name video-interview-POC-Deploy \
               --s3-location s3://{{ .Environment.AWS_CODE_DEPLOY_S3_BUCKET }}/{{ .Environment.CODE_DEPLOY_FILENAME }} --ignore-hidden-files
