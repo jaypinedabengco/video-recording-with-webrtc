@@ -8,6 +8,10 @@ hooks:
     - location: code_deploy_scripts/install_dependencies.sh
       timeout: 300
       runas: root
+  Install: 
+    - location: code_deploy_scripts/install.sh
+      timeout: 300
+      runas: root
   AfterInstall:
     - location: code_deploy_scripts/after_install.sh
       timeout: 300
