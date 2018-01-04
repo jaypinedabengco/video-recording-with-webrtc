@@ -8,10 +8,11 @@ jobs:
           - master
     docker:
       - image: node:6.11.2 #primary container
+      - image: redis:3.2.4 #add redis image
         environment: 
           VT_REDIS_HOST: 127.0.0.1
           VT_REDIS_PORT: 6379
-      - image: redis:3.2.4 #add redis image
+          CODE_DEPLOY_FILENAME: 'code-deploy-bt-{{ epoch }}-bn-{{ .BuildNum }}-branch-{{ .Branch }}/Deploy_Build.zip'      
     steps:
       - checkout
 
@@ -63,7 +64,12 @@ jobs:
       - run: 
           name: Test
           command: npm test   
-
+      - run: 
+          name: Code Deploy - package
+          command: 
+            aws deploy push \
+              --application-name video-interview-POC-Deploy \
+              --s3-location s3://{{ .Environment.AWS_CODE_DEPLOY_S3_BUCKET }}/{{ .Environment.CODE_DEPLOY_FILENAME }} --ignore-hidden-files
       # - store_artifacts: 
       #     path: test-results.xml
       #     prefix: tests

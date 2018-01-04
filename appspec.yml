@@ -2,7 +2,7 @@ version: 0.0
 os: linux
 files:
   - source: /
-    destination: /
+    destination: /application/
 hooks:
   BeforeInstall:
     - location: code_deploy_scripts/install_dependencies.sh
