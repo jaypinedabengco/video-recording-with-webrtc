@@ -1,4 +1,4 @@
 #!/bin/bash
 
 #stop
-/usr/local/bin/pm2 stop all
+pm2 stop all
