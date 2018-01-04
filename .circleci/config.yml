@@ -28,7 +28,7 @@ jobs:
           command: |
             npm install -g bower
             apt-get -y update
-            apt-get -y awscli
+            apt-get -y install awscli
       - save_cache: 
           key: global-cache-1-{{ checksum ".circleci/config.yml" }}
           paths: 
