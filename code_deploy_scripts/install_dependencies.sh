@@ -7,8 +7,6 @@ nvm install 6.11.5
 nvm use 6.11.5 #update node version
 
 #Install PM2
-sudo npm install pm2 -g
-pm2 update
 
 
     
