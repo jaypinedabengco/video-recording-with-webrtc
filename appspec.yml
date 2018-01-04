@@ -5,18 +5,18 @@ files:
     destination: /application/
 hooks:
   BeforeInstall:
-    - location: code_deploy_scripts/install_dependencies.sh
+    - location: /application/code_deploy_scripts/install_dependencies.sh
       timeout: 300
       runas: root
   AfterInstall:
-    - location: code_deploy_scripts/after_install.sh
+    - location: /application/code_deploy_scripts/after_install.sh
       timeout: 300
       runas: root
   ApplicationStart:
-    - location: code_deploy_scripts/start_server.sh
+    - location: /application/code_deploy_scripts/start_server.sh
       timeout: 300
       runas: root
   ApplicationStop:
-    - location: code_deploy_scripts/stop_server.sh
+    - location: /application/code_deploy_scripts/stop_server.sh
       timeout: 300
       runas: root
