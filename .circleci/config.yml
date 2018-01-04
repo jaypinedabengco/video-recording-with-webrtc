@@ -27,8 +27,7 @@ jobs:
           name: Add application dependencies
           command: |
             npm install -g bower
-            apt-get -y update --only-upgrade awscli
-            apt-get -y install 
+            apt-get -y install --only-upgrade awscli
       - save_cache: 
           key: global-cache-1-{{ checksum ".circleci/config.yml" }}
           paths: 
