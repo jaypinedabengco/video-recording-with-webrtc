@@ -79,6 +79,6 @@ jobs:
           name: Code Deploy - package
           command: |
             aws deploy push \
-              --application-name AWS_CODE_DEPLOY_APPLICATION_NAME \
+              --application-name $AWS_CODE_DEPLOY_APPLICATION_NAME \
               --s3-location s3://$AWS_CODE_DEPLOY_S3_BUCKET/$CODE_DEPLOY_FILENAME \
               --ignore-hidden-files
