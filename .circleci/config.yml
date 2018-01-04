@@ -12,11 +12,9 @@ jobs:
           VT_REDIS_HOST: 127.0.0.1
           VT_REDIS_PORT: 6379
       - image: redis:3.2.4 #add redis image
-    environment: 
-      - CODE_DEPLOY_FILENAME: 'code-deploy-bt-{{ epoch }}-bn-{{ .BuildNum }}-branch-{{ .Branch }}/Deploy_Build.zip'                  
     steps:
       - checkout
-
+      
       # Install & Cache  
       # Global  
       - restore_cache: 
@@ -74,6 +72,13 @@ jobs:
             pip install --upgrade virtualenv
             pip install awscli --upgrade
       - run: 
+          name: Add Environment Variables for Code Deploy
+          command: |
+            echo 'export CODE_DEPLOY_FILENAME=$(date +%F-%T)/code_file.zip' >> $BASH_ENV
+      - run: 
           name: Code Deploy - package
           command: |
-            aws deploy push --application-name video-interview-POC-Deploy --s3-location s3://code-deploy-video-interview-poc-dev/$CODE_DEPLOY_FILENAME --ignore-hidden-files
+            aws deploy push \
+              --application-name AWS_CODE_DEPLOY_APPLICATION_NAME \
+              --s3-location s3://$AWS_CODE_DEPLOY_S3_BUCKET/$CODE_DEPLOY_FILENAME \
+              --ignore-hidden-files
