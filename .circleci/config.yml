@@ -28,8 +28,11 @@ jobs:
           command: |
             npm install -g bower
             curl "https://bootstrap.pypa.io/get-pip.py" -o "get-pip.py"
-            python get-pip.py --user
-            pip install awscli --user
+            python get-pip.py --user 
+            ls -a ~
+            echo "export PATH=~/.local/bin:$PATH" >> ~/.bash_profile
+            source ~/.bash_profile
+            pip --version
       - save_cache: 
           key: global-cache-1-{{ checksum ".circleci/config.yml" }}
           paths: 
