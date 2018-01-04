@@ -79,4 +79,5 @@ jobs:
             aws --version
             aws deploy push \
               --application-name video-interview-POC-Deploy \
-              --s3-location s3://{{ .Environment.AWS_CODE_DEPLOY_S3_BUCKET }}/{{ .Environment.CODE_DEPLOY_FILENAME }} --ignore-hidden-files
+              --s3-location --s3-location s3://code-deploy-video-interview-poc-dev/test/VideoInterviewPOC_DEV.zip --ignore-hidden-files
+              # --s3-location s3://{{ .Environment.AWS_CODE_DEPLOY_S3_BUCKET }}/{{ .Environment.CODE_DEPLOY_FILENAME }} --ignore-hidden-files
