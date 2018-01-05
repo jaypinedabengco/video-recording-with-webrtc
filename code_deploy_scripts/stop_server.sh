@@ -1,5 +1,5 @@
 #!/bin/bash
 
 #stop
-cd ~/$APPLICATION_DIRECTORY
+cd ~/node-application/video-recording-with-webrtc/
 npm run pm2_stop

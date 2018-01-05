@@ -32,9 +32,9 @@ set_environment_variable_to_bash_profile(){
 # ---------------------
 PS_REGION=ap-southeast-1
 
-NODE_ENV=$(aws ssm get-parameters --region $PS_REGION --names video-interview-poc.dev.NODE_ENV --with-decryption --query Parameters[0].Value)
-VT_REDIS_HOST=$(aws ssm get-parameters --region $PS_REGION --names video-interview-poc.dev.redis.host --with-decryption --query Parameters[0].Value)
-VT_REDIS_PORT=$(aws ssm get-parameters --region $PS_REGION --names video-interview-poc.dev.redis.port --with-decryption --query Parameters[0].Value)
+PS_NODE_ENV=$(aws ssm get-parameters --region $PS_REGION --names video-interview-poc.dev.NODE_ENV --with-decryption --query Parameters[0].Value)
+PS_VT_REDIS_HOST=$(aws ssm get-parameters --region $PS_REGION --names video-interview-poc.dev.redis.host --with-decryption --query Parameters[0].Value)
+PS_VT_REDIS_PORT=$(aws ssm get-parameters --region $PS_REGION --names video-interview-poc.dev.redis.port --with-decryption --query Parameters[0].Value)
 
 # ---------------------
 # SET VARIABLES
@@ -43,8 +43,8 @@ VT_REDIS_PORT=$(aws ssm get-parameters --region $PS_REGION --names video-intervi
 source ~/.bash_profile #REFRESH 
 
 set_environment_variable_to_bash_profile "APPLICATION_DIRECTORY" "~/node-application/video-recording-with-webrtc/"
-set_environment_variable_to_bash_profile "NODE_ENV" "$NODE_ENV"
-set_environment_variable_to_bash_profile "VT_REDIS_HOST" "$VT_REDIS_HOST"
-set_environment_variable_to_bash_profile "VT_REDIS_PORT" "$VT_REDIS_PORT"
+set_environment_variable_to_bash_profile "NODE_ENV" "DVXER"
+set_environment_variable_to_bash_profile "VT_REDIS_HOST" $(aws ssm get-parameters --region $PS_REGION --names video-interview-poc.dev.redis.host --with-decryption --query Parameters[0].Value)
+set_environment_variable_to_bash_profile "VT_REDIS_PORT" "$PS_VT_REDIS_PORT"
 
 source ~/.bash_profile #REFRESH 
