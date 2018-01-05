@@ -76,7 +76,7 @@ jobs:
       - run: 
           name: Add Environment Variables for Code Deploy
           command: |
-            echo "export CODE_DEPLOY_FILENAME="$(date +'%Y-%m-%d-%H:%M:%S')/packaged_application.zip" >> $BASH_ENV
+            echo "export CODE_DEPLOY_FILENAME="$(date +'%Y-%m-%d-%H:%M:%S')/packaged_application.zip"" >> $BASH_ENV
       - run: 
           name: Code Deploy - Package Application
           command: |
