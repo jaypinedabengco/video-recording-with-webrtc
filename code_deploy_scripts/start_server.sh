@@ -1,5 +1,6 @@
 #!/bin/bash
 
+. ~/.bash_profile
 source ~/.bash_profile
 
 #Start PM2
