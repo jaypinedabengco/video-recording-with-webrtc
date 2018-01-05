@@ -2,4 +2,4 @@
 
 #stop
 cd /application/
-pm2 stop all
+npm run pm2_stop
