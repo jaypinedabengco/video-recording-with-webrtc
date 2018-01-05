@@ -25,6 +25,13 @@ jobs:
           name: Add application dependencies
           command: |
             npm install -g bower
+
+            #Dependencies for AWS Code Deploy
+            apt-get -y update
+            apt-get -y install python-pip python-dev build-essential 
+            pip install --upgrade pip
+            pip install --upgrade virtualenv
+            pip install awscli --upgrade            
       - save_cache: 
           key: global-cache-1-{{ checksum ".circleci/config.yml" }}
           paths: 
@@ -62,15 +69,7 @@ jobs:
             - public/bower_components
       - run: 
           name: Test
-          command: npm test   
-      - run:
-          name: Add Code Deploy Dependencies 
-          command: |
-            apt-get -y update
-            apt-get -y install python-pip python-dev build-essential 
-            pip install --upgrade pip
-            pip install --upgrade virtualenv
-            pip install awscli --upgrade
+          command: npm test
       - run: 
           name: Add Environment Variables for Code Deploy
           command: |
