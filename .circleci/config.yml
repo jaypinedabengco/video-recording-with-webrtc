@@ -17,62 +17,62 @@ jobs:
       
       # Install & Cache  
       # Global  
-      # - restore_cache: 
-      #     keys: 
-      #       - global-cache-1-{{ checksum ".circleci/config.yml" }}
-      #       - global-cache-1        
-      # - run: 
-      #     name: Add application dependencies
-      #     command: |
-      #       npm install -g bower
-      #       npm install -g pm2
-      #       #Dependencies for AWS Code Deploy
-      #       apt-get -y update
-      #       apt-get -y install python-pip python-dev build-essential 
-      #       pip install --upgrade pip
-      #       pip install --upgrade virtualenv
-      #       pip install awscli --upgrade            
-      # - save_cache: 
-      #     key: global-cache-1-{{ checksum ".circleci/config.yml" }}
-      #     paths: 
-      #       - /usr/local/lib/node_modules
-      #       - /usr/local/bin
+      - restore_cache: 
+          keys: 
+            - global-cache-1-{{ checksum ".circleci/config.yml" }}
+            - global-cache-1        
+      - run: 
+          name: Add application dependencies
+          command: |
+            npm install -g bower
+            npm install -g pm2
+            #Dependencies for AWS Code Deploy
+            apt-get -y update
+            apt-get -y install python-pip python-dev build-essential 
+            pip install --upgrade pip
+            pip install --upgrade virtualenv
+            pip install awscli --upgrade            
+      - save_cache: 
+          key: global-cache-1-{{ checksum ".circleci/config.yml" }}
+          paths: 
+            - /usr/local/lib/node_modules
+            - /usr/local/bin
 
-      # # Install & Cache             
-      # # NPM vendors
-      # - restore_cache: 
-      #     keys: 
-      #       - npm-cache-1-{{ checksum "package.json" }}
-      #       - npm-cache-1       
-      # - run: 
-      #     name: Install Node
-      #     command: |
-      #       npm install     
-      # - save_cache: 
-      #     key: npm-cache-1-{{ checksum "package.json" }}
-      #     paths: 
-      #       - node_modules
+      # Install & Cache             
+      # NPM vendors
+      - restore_cache: 
+          keys: 
+            - npm-cache-1-{{ checksum "package.json" }}
+            - npm-cache-1       
+      - run: 
+          name: Install Node
+          command: |
+            npm install     
+      - save_cache: 
+          key: npm-cache-1-{{ checksum "package.json" }}
+          paths: 
+            - node_modules
 
-      # # Install & Cache 
-      # # bower vendors            
-      # - restore_cache: 
-      #     keys: 
-      #       - bower-cache-1-{{ checksum "bower.json" }}
-      #       - bower-cache         
-      # - run: 
-      #     name: Install Bower
-      #     command: |
-      #       bower install    
-      # - save_cache: 
-      #     key: bower-cache-1-{{ checksum "bower.json" }}
-      #     paths: 
-      #       - public/bower_components
-      # - run: 
-      #     name: Do Unit Test
-      #     command: npm test
-      # - run:
-      #     name: Test Deploy to PM2
-      #     command: npm run pm2_start
+      # Install & Cache 
+      # bower vendors            
+      - restore_cache: 
+          keys: 
+            - bower-cache-1-{{ checksum "bower.json" }}
+            - bower-cache         
+      - run: 
+          name: Install Bower
+          command: |
+            bower install    
+      - save_cache: 
+          key: bower-cache-1-{{ checksum "bower.json" }}
+          paths: 
+            - public/bower_components
+      - run: 
+          name: Do Unit Test
+          command: npm test
+      - run:
+          name: Test Deploy to PM2
+          command: npm run pm2_start
       - run: 
           name: Add Environment Variables for Code Deploy
           command: |
@@ -80,18 +80,18 @@ jobs:
       - run: 
           name: Code Deploy - Package Application
           command: |
-            echo $CODE_DEPLOY_FILENAME
-            # aws deploy push \
-            #   --application-name $AWS_CODE_DEPLOY_APPLICATION_NAME \
-            #   --s3-location s3://$AWS_CODE_DEPLOY_S3_BUCKET/$CODE_DEPLOY_FILENAME \
-            #   --ignore-hidden-files
+            echo "CODE_DEPLOY Filename $CODE_DEPLOY_FILENAME"
+            aws deploy push \
+              --application-name $AWS_CODE_DEPLOY_APPLICATION_NAME \
+              --s3-location s3://$AWS_CODE_DEPLOY_S3_BUCKET/$CODE_DEPLOY_FILENAME \
+              --ignore-hidden-files
       - run: 
           name: Code Deploy - Deploy Application
           command: |
-            echo $CODE_DEPLOY_FILENAME
-            # aws deploy create-deployment \
-            #   --ignore-application-stop-failures \
-            #   --application-name $AWS_CODE_DEPLOY_APPLICATION_NAME \
-            #   --deployment-config-name CodeDeployDefault.OneAtATime \
-            #   --deployment-group-name $AWS_CODE_DEPLOY_DEPLOYMENT_GROUP_NAME \
-            #   --s3-location bucket=$AWS_CODE_DEPLOY_S3_BUCKET,bundleType=zip,key=$CODE_DEPLOY_FILENAME          
+            echo "CODE_DEPLOY Filename $CODE_DEPLOY_FILENAME"
+            aws deploy create-deployment \
+              --ignore-application-stop-failures \
+              --application-name $AWS_CODE_DEPLOY_APPLICATION_NAME \
+              --deployment-config-name CodeDeployDefault.OneAtATime \
+              --deployment-group-name $AWS_CODE_DEPLOY_DEPLOYMENT_GROUP_NAME \
+              --s3-location bucket=$AWS_CODE_DEPLOY_S3_BUCKET,bundleType=zip,key=$CODE_DEPLOY_FILENAME          
