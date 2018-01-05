@@ -27,15 +27,26 @@ set_environment_variable_to_bash_profile(){
 	fi
 }
 
-source ~/.bash_profile #REFRESH 
+# ---------------------
+# GET CONTENTS FROM AWS Parameter Store
+# ---------------------
+PS_REGION=ap-southeast-1
+
+NODE_ENV=$(aws ssm get-parameters --region $PS_REGION --names video-interview-poc.dev.NODE_ENV --with-decryption --query Parameters[0].Value)
+VT_REDIS_HOST=$(aws ssm get-parameters --region $PS_REGION --names video-interview-poc.dev.redis.host --with-decryption --query Parameters[0].Value)
+VT_REDIS_PORT=$(aws ssm get-parameters --region $PS_REGION --names video-interview-poc.dev.redis.port --with-decryption --query Parameters[0].Value)
 
 # ---------------------
 # SET VARIABLES
 # ---------------------
 
+NODE_ENV=$(aws ssm get-parameters --region $region --names $1 --with-decryption --query Parameters[0].Value)
+
+source ~/.bash_profile #REFRESH 
+
 set_environment_variable_to_bash_profile "APPLICATION_DIRECTORY" "~/node-application/video-recording-with-webrtc/"
-set_environment_variable_to_bash_profile "NODE_ENV" "$DEPLOYMENT_GROUP_NAME"
-set_environment_variable_to_bash_profile "VT_REDIS_HOST" "video-i-poc-dev.zuvakz.0001.apse1.cache.amazonaws.com"
-set_environment_variable_to_bash_profile "VT_REDIS_PORT" "6379"
+set_environment_variable_to_bash_profile "NODE_ENV" NODE_ENV
+set_environment_variable_to_bash_profile "VT_REDIS_HOST" VT_REDIS_HOST
+set_environment_variable_to_bash_profile "VT_REDIS_PORT" VT_REDIS_PORT
 
 source ~/.bash_profile #REFRESH 
