@@ -4,7 +4,7 @@ source /home/ec2-user/.bash_profile
 source /home/ec2-user/.bashrc
 
 #Start PM2
-cd $APPLICATION_DIRECTORY
+cd /home/ec2-user/node-application/video-recording-with-webrtc/
 echo "LOCATION $APPLICATION_DIRECTORY"
 echo "PRESENT WORKING DIRECTORY"
 pwd
