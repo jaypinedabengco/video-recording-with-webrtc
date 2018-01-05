@@ -76,22 +76,22 @@ jobs:
       - run: 
           name: Add Environment Variables for Code Deploy
           command: |
-            echo "export CODE_DEPLOY_FILENAME=TEST/packaged_application.zip" >> $BASH_ENV
+            echo "export CODE_DEPLOY_FILENAME="$(date +'%d/%m/%Y')"/packaged_application.zip" >> $BASH_ENV
       - run: 
           name: Code Deploy - Package Application
           command: |
             echo $CODE_DEPLOY_FILENAME
-            aws deploy push \
-              --application-name $AWS_CODE_DEPLOY_APPLICATION_NAME \
-              --s3-location s3://$AWS_CODE_DEPLOY_S3_BUCKET/$CODE_DEPLOY_FILENAME \
-              --ignore-hidden-files
+            # aws deploy push \
+            #   --application-name $AWS_CODE_DEPLOY_APPLICATION_NAME \
+            #   --s3-location s3://$AWS_CODE_DEPLOY_S3_BUCKET/$CODE_DEPLOY_FILENAME \
+            #   --ignore-hidden-files
       - run: 
           name: Code Deploy - Deploy Application
           command: |
             echo $CODE_DEPLOY_FILENAME
-            aws deploy create-deployment \
-              --ignore-application-stop-failures \
-              --application-name $AWS_CODE_DEPLOY_APPLICATION_NAME \
-              --deployment-config-name CodeDeployDefault.OneAtATime \
-              --deployment-group-name $AWS_CODE_DEPLOY_DEPLOYMENT_GROUP_NAME \
-              --s3-location bucket=$AWS_CODE_DEPLOY_S3_BUCKET,bundleType=zip,key=$CODE_DEPLOY_FILENAME          
+            # aws deploy create-deployment \
+            #   --ignore-application-stop-failures \
+            #   --application-name $AWS_CODE_DEPLOY_APPLICATION_NAME \
+            #   --deployment-config-name CodeDeployDefault.OneAtATime \
+            #   --deployment-group-name $AWS_CODE_DEPLOY_DEPLOYMENT_GROUP_NAME \
+            #   --s3-location bucket=$AWS_CODE_DEPLOY_S3_BUCKET,bundleType=zip,key=$CODE_DEPLOY_FILENAME          
