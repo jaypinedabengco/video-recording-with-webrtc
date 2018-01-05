@@ -27,16 +27,15 @@ set_environment_variable_to_bash_profile(){
 	fi
 }
 
-source /home/ec2-user/.bash_profile #REFRESH 
+source ~/.bash_profile #REFRESH 
 
 # ---------------------
 # SET VARIABLES
 # ---------------------
 
-set_environment_variable_to_bash_profile "APPLICATION_DIRECTORY" "/home/ec2-user/node-application/video-recording-with-webrtc/"
+set_environment_variable_to_bash_profile "APPLICATION_DIRECTORY" "~/node-application/video-recording-with-webrtc/"
 set_environment_variable_to_bash_profile "NODE_ENV" "$DEPLOYMENT_GROUP_NAME"
 set_environment_variable_to_bash_profile "VT_REDIS_HOST" "video-i-poc-dev.zuvakz.0001.apse1.cache.amazonaws.com"
 set_environment_variable_to_bash_profile "VT_REDIS_PORT" "6379"
 
-source /home/ec2-user/.bash_profile #REFRESH 
-
+source ~/.bash_profile #REFRESH 

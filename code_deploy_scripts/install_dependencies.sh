@@ -9,5 +9,3 @@ nvm use 6.11.5 #update node version
 #Install PM2
 npm install -g pm2
 pm2 update
-
-    

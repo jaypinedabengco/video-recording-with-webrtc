@@ -1,5 +1,5 @@
 #!/bin/bash
 
 #stop
-cd /application/
+cd ~/$APPLICATION_DIRECTORY
 npm run pm2_stop
