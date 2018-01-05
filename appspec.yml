@@ -2,7 +2,7 @@ version: 0.0
 os: linux
 files:
   - source: /
-    destination: /application/
+    destination: /home/ec2-user/application/
 hooks:
   BeforeInstall:
     - location: code_deploy_scripts/install_dependencies.sh

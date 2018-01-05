@@ -7,7 +7,7 @@ nvm install 6.11.5
 nvm use 6.11.5 #update node version
 
 #Set Application Directory, based on appspec.yml
-export APPLICATION_DIRECTORY="/application/"
+export APPLICATION_DIRECTORY="/home/ec2-user/node-application/video-recording-with-webrtc/"
 
 
     
