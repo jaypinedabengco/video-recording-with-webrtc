@@ -17,7 +17,7 @@ hooks:
       timeout: 300
       runas: ec2-user
   ValidateService: 
-    - location: code_deploy_scripts/update_environment_variables
+    - location: code_deploy_scripts/update_environment_variables.sh
       timeout: 300
       runas: ec2-user    
   ApplicationStart:
