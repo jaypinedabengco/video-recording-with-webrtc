@@ -4,6 +4,12 @@
 # SET ENVIRONMENT VARIABLES
 # ####################################
 
+# ------------------------
+# Build Variables
+# ------------------------
+export BUILD_BASH_PROFILE_LOCATION=/home/ec2-user/.bash_profile
+
+
 # ---------------------
 # Utilities
 # ---------------------
@@ -16,14 +22,13 @@ set_environment_variable_to_bash_profile(){
 	if env | grep -q ^"$variable_name"=
 	then
 		local old_variable_content=${!variable_name}
-	  	echo env variable is already exported
 	  	echo "export $variable_name=$old_variable_content"
 	  	echo "export $variable_name=$variable_value"
-	  	sed -i "/export $variable_name=\b/c\export $variable_name=$variable_value" /home/ec2-user/.bash_profile
+	  	sed -i "/export $variable_name=\b/c\export $variable_name=$variable_value" $BUILD_BASH_PROFILE_LOCATION
 	else
 	  	echo env variable was not exported, but now it is
-   		echo "export $variable_name=$variable_value" >> /home/ec2-user/.bash_profile
-		source /home/ec2-user/.bash_profile 		
+   		echo "export $variable_name=$variable_value" >> $BUILD_BASH_PROFILE_LOCATION
+		source $BUILD_BASH_PROFILE_LOCATION 		
 	fi
 }
 
@@ -42,9 +47,9 @@ PS_VT_REDIS_PORT=$(aws ssm get-parameters --region $PS_REGION --names video-inte
 
 source ~/.bash_profile #REFRESH 
 
-set_environment_variable_to_bash_profile "DEPLOYMENT_GROUP_NAME" "$DEPLOYMENT_GROUP_NAME"
+set_environment_variable_to_bash_profile "BUILD_DEPLOYMENT_GROUP_NAME" "$DEPLOYMENT_GROUP_NAME"
 set_environment_variable_to_bash_profile "APPLICATION_DIRECTORY" "~/node-application/video-recording-with-webrtc/"
-set_environment_variable_to_bash_profile "NODE_ENV" "Devle"
+set_environment_variable_to_bash_profile "NODE_ENV" "Devlexx"
 set_environment_variable_to_bash_profile "VT_REDIS_HOST" "$(aws ssm get-parameters --region $PS_REGION --names video-interview-poc.dev.redis.host --with-decryption --query Parameters[0].Value)"
 set_environment_variable_to_bash_profile "VT_REDIS_PORT" "$PS_VT_REDIS_PORT"
 
