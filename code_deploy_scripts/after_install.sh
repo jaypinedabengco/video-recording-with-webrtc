@@ -8,7 +8,8 @@
 # Build Variables
 # ------------------------
 export BUILD_BASH_PROFILE_LOCATION=/home/ec2-user/.bash_profile
-
+rm -rf $BUILD_BASH_PROFILE_LOCATION
+touch $BUILD_BASH_PROFILE_LOCATION
 
 # ---------------------
 # Utilities
