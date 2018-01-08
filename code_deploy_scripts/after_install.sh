@@ -19,12 +19,14 @@ set_environment_variable_to_bash_profile(){
 	local variable_name=$1
 	local variable_value=$2
 
+	source /home/ec2-user/.bash_profile
 	if env | grep -q ^"$variable_name"=
 	then
 		local old_variable_content=${!variable_name}
 	  	echo "export $variable_name=$old_variable_content"
 	  	echo "export $variable_name=$variable_value"
 	  	sed -i "/export $variable_name=\b/c\export $variable_name=$variable_value" /home/ec2-user/.bash_profile
+		source /home/ec2-user/.bash_profile		  
 	else
 	  	echo env variable was not exported, but now it is
    		echo "export $variable_name=$variable_value" >> /home/ec2-user/.bash_profile
