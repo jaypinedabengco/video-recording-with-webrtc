@@ -17,7 +17,8 @@ set_environment_variable_to_bash_profile(){
 	fi
 }
 
-set_environment_variable_to_bash_profile "xVT_REDIS_HOST" $(aws ssm get-parameters --region ap-southeast-1 --names video-interview-poc.dev.redis.host --with-decryption --query Parameters[0].Value)
+GP_VT_REDIS_HOST=$(aws ssm get-parameters --region ap-southeast-1 --names video-interview-poc.dev.redis.host --with-decryption --query Parameters[0].Value) &&
+set_environment_variable_to_bash_profile "xVT_REDIS_HOST" $GP_VT_REDIS_HOST
 
 
 . ~/.bash_profile
