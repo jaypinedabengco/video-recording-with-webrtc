@@ -1,7 +1,7 @@
 #!/bin/bash
 
-. ~/.bash_profile
-source ~/.bash_profile
+# . ~/.bash_profile
+# source ~/.bash_profile
 . /home/ec2-user/.bash_profile
 source /home/ec2-user/.bash_profile
 
