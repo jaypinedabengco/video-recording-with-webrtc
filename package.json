@@ -4,7 +4,7 @@
   "private": true,
   "scripts": {
     "start": "node ./bin/www",
-    "pm2_start": "source ~/.bash_profile; pm2 start ./bin/www --name 'video-recording-with-webrtc'",
+    "pm2_start": "pm2 start ./bin/www --name 'video-recording-with-webrtc'",
     "pm2_stop": "pm2 stop video-recording-with-webrtc; pm2 delete video-recording-with-webrtc", 
     "dev": "DEBUG=video-recording-with-webrtc:server ./node_modules/.bin/nodemon --config nodemon.json ./bin/www",
     "dev-second-server": "HTTP_PORT=8082 HTTPS_PORT=8445 DEBUG=video-recording-with-webrtc:server ./node_modules/.bin/nodemon --config nodemon.json ./bin/www",

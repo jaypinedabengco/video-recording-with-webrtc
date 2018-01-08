@@ -20,8 +20,14 @@
 # GP_VT_REDIS_HOST=$(aws ssm get-parameters --region ap-southeast-1 --names video-interview-poc.dev.redis.host --with-decryption --query Parameters[0].Value) &&
 # set_environment_variable_to_bash_profile "xVT_REDIS_HOST" $GP_VT_REDIS_HOST
 
+sleep 5
+
 . ~/.bash_profile
 source ~/.bash_profile
+. /home/ec2-user/.bash_profile
+source /home/ec2-user/.bash_profile
+
+sleep 5
 
 #Start PM2
 cd ~/node-application/video-recording-with-webrtc/
