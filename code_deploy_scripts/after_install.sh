@@ -47,7 +47,7 @@ PS_VT_REDIS_PORT=$(aws ssm get-parameters --region $PS_REGION --names video-inte
 
 source ~/.bash_profile #REFRESH 
 
-set_environment_variable_to_bash_profile "BUILD_DEPLOYMENT_GROUP_NAME" "$DEPLOYMENT_GROUP_NAME"
+set_environment_variable_to_bash_profile "BUILD_DEPLOYMENT_GROUP_NAME" $DEPLOYMENT_GROUP_NAME
 set_environment_variable_to_bash_profile "APPLICATION_DIRECTORY" "~/node-application/video-recording-with-webrtc/"
 set_environment_variable_to_bash_profile "NODE_ENV" $PS_NODE_ENV
 set_environment_variable_to_bash_profile "VT_REDIS_HOST" $PS_VT_REDIS_HOST
