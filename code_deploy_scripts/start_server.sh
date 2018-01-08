@@ -1,13 +1,9 @@
 #!/bin/bash
 
-sleep 5
-
 . ~/.bash_profile
 source ~/.bash_profile
 . /home/ec2-user/.bash_profile
 source /home/ec2-user/.bash_profile
-
-sleep 5
 
 #TEST
 PS_REGION=ap-southeast-1
