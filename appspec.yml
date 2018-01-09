@@ -20,13 +20,9 @@ hooks:
       timeout: 300
       runas: ec2-user
   AfterInstall:
-    - location: code_deploy_scripts/after_install.sh
-      timeout: 300
-      runas: ec2-user
-  ValidateService: 
     - location: code_deploy_scripts/update_environment_variables.sh
       timeout: 300
-      runas: ec2-user    
+      runas: ec2-user
   ApplicationStart:
     - location: code_deploy_scripts/start_server.sh
       timeout: 300
