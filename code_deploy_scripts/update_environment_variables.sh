@@ -80,7 +80,7 @@ if [ "$USE_DOCKER_FOR_REDIS" == "true" ]; then
 	# Create a docker component for redis
 	# ------------
 	REDIS_DOCKER_NAME=packt-redis
-	REDIS_DOCKER_PORT=16379
+	REDIS_DOCKER_PORT=6379
 
 	#Check if redis docker exists, then remove
 	if [ "$(docker ps -q -f name=$REDIS_DOCKER_NAME)" ]; then
