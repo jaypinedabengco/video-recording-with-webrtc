@@ -55,7 +55,13 @@ if [ "$DEPLOYMENT_GROUP_NAME" == "video-interview-POC-Deploy-Group-Dev" ]; then
 	# ------------
 	REDIS_DOCKER_NAME=packt-redis
 	REDIS_DOCKER_PORT=16379
-	
+
+	#Check if redis docker exists
+	if [ ! "$(docker ps -q -f name=$REDIS_DOCKER_NAME)" ]; then
+		# cleanup
+		docker rm -f $REDIS_DOCKER_NAME
+	fi
+
 	#delete
 	docker rm -f $REDIS_DOCKER_NAME
 	#start
