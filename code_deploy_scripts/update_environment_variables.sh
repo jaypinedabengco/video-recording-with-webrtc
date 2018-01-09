@@ -106,8 +106,8 @@ source $BUILD_BASH_PROFILE_LOCATION #REFRESH
 set_environment_variable_to_bash_profile "BUILD_DEPLOYMENT_GROUP_NAME" $DEPLOYMENT_GROUP_NAME
 set_environment_variable_to_bash_profile "APPLICATION_DIRECTORY" $APPLICATION_LOCATION
 set_environment_variable_to_bash_profile "NODE_ENV" $PS_NODE_ENV_VALUE
-set_environment_variable_to_bash_profile "VT_REDIS_HOST" $PS_VT_REDIS_HOST
-set_environment_variable_to_bash_profile "VT_REDIS_PORT" $PS_VT_REDIS_PORT
+set_environment_variable_to_bash_profile "VT_REDIS_HOST" $PS_REDIS_HOST_VALUE
+set_environment_variable_to_bash_profile "VT_REDIS_PORT" $PS_REDIS_PORT_VALUE
 
 source $BUILD_BASH_PROFILE_LOCATION #REFRESH
 
