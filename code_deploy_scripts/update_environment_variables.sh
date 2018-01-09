@@ -38,7 +38,6 @@ set_environment_variable_to_bash_profile(){
 # --------
 cd $APPLICATION_LOCATION
 
-
 # ---------------------
 # GET CONTENTS FROM AWS Parameter Store
 # ---------------------
@@ -62,14 +61,15 @@ if [ "$DEPLOYMENT_GROUP_NAME" == "video-interview-POC-Deploy-Group-Dev" ]; then
 		docker rm -f $REDIS_DOCKER_NAME
 	fi
 
-	#delete
-	docker rm -f $REDIS_DOCKER_NAME
 	#start
 	docker run --name $REDIS_DOCKER_NAME -p $REDIS_DOCKER_PORT:6379 -d redis:3.2.4
+
+	PS_VT_REDIS_HOST=127.0.0.1
+	PS_VT_REDIS_PORT=16379
 else
 	#Get Redis Config from stored parameters
-	PS_VT_REDIS_HOST=$(aws ssm get-parameters --region $PS_REGION --names video-interview-poc.dev.redis.host --with-decryption --query Parameters[0].Value)
-	PS_VT_REDIS_PORT=$(aws ssm get-parameters --region $PS_REGION --names video-interview-poc.dev.redis.port --with-decryption --query Parameters[0].Value)
+	PS_VT_REDIS_HOST="SET REDIS HOST FOR PROD HERE"
+	PS_VT_REDIS_PORT="SET REDIS PORT FOR PROD HERE"
 fi
 
 # ---------------------
