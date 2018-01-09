@@ -1,4 +1,5 @@
 #!/bin/bash
+set -e
 
 # ####################################
 # SET ENVIRONMENT VARIABLES
@@ -78,3 +79,10 @@ set_environment_variable_to_bash_profile "VT_REDIS_HOST" $PS_VT_REDIS_HOST
 set_environment_variable_to_bash_profile "VT_REDIS_PORT" $PS_VT_REDIS_PORT
 
 source $BUILD_BASH_PROFILE_LOCATION #REFRESH
+
+
+# add node to startup
+hasRc=`grep "su -l $USER" /etc/rc.d/rc.local | cat`
+if [ -z "$hasRc" ]; then
+    sudo sh -c "echo 'su -l $USER -c \"cd ~/node-applications/video-recording-with-webrtc;sh ./start_server.sh\"' >> /etc/rc.d/rc.local"
+fi
