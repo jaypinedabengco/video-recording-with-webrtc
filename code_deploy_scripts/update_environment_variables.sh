@@ -1,7 +1,55 @@
 #!/bin/bash
 
-# TEST UPDATE ENV VARIABLE
-# PS_REGION=ap-southeast-1
-# export PS_NODE_ENV=$(aws ssm get-parameters --region $PS_REGION --names video-interview-poc.dev.NODE_ENV --with-decryption --query Parameters[0].Value)
-# export PS_VT_REDIS_HOST=$(aws ssm get-parameters --region $PS_REGION --names video-interview-poc.dev.redis.host --with-decryption --query Parameters[0].Value)
-# export PS_VT_REDIS_PORT=$(aws ssm get-parameters --region $PS_REGION --names video-interview-poc.dev.redis.port --with-decryption --query Parameters[0].Value)
+# ####################################
+# SET ENVIRONMENT VARIABLES
+# ####################################
+
+# ------------------------
+# Build Variables
+# ------------------------
+export BUILD_BASH_PROFILE_LOCATION=/home/ec2-user/.bash_profile
+rm -rf $BUILD_BASH_PROFILE_LOCATION
+touch $BUILD_BASH_PROFILE_LOCATION
+
+# ---------------------
+# Utilities
+# ---------------------
+
+# Will be used to automatically update environment variables
+set_environment_variable_to_bash_profile(){
+	local variable_name=$1
+	local variable_value=$2
+
+	hasEnv=`grep "export $variable_name" /home/ec2-user/.bash_profile | cat`
+	if [ -z "$hasEnv" ]; then
+   		echo "export $variable_name=$variable_value" >> /home/ec2-user/.bash_profile
+		source /home/ec2-user/.bash_profile
+	else
+        local old_variable_content=${!variable_name}
+        sed -i "/export $variable_name=\b/c\export $variable_name=$variable_value" /home/ec2-user/.bash_profile
+		source /home/ec2-user/.bash_profile	    
+	fi
+}
+
+# ---------------------
+# GET CONTENTS FROM AWS Parameter Store
+# ---------------------
+PS_REGION=ap-southeast-1
+
+PS_NODE_ENV=$(aws ssm get-parameters --region $PS_REGION --names video-interview-poc.dev.NODE_ENV --with-decryption --query Parameters[0].Value)
+PS_VT_REDIS_HOST=$(aws ssm get-parameters --region $PS_REGION --names video-interview-poc.dev.redis.host --with-decryption --query Parameters[0].Value)
+PS_VT_REDIS_PORT=$(aws ssm get-parameters --region $PS_REGION --names video-interview-poc.dev.redis.port --with-decryption --query Parameters[0].Value)
+
+# ---------------------
+# SET VARIABLES
+# ---------------------
+
+source $BUILD_BASH_PROFILE_LOCATION #REFRESH 
+
+set_environment_variable_to_bash_profile "BUILD_DEPLOYMENT_GROUP_NAME" $DEPLOYMENT_GROUP_NAME
+set_environment_variable_to_bash_profile "APPLICATION_DIRECTORY" "/home/ec2-user/node-applications/video-recording-with-webrtc"
+set_environment_variable_to_bash_profile "NODE_ENV" $PS_NODE_ENV
+set_environment_variable_to_bash_profile "VT_REDIS_HOST" $PS_VT_REDIS_HOST
+set_environment_variable_to_bash_profile "VT_REDIS_PORT" $PS_VT_REDIS_PORT
+
+source $BUILD_BASH_PROFILE_LOCATION #REFRESH

@@ -16,6 +16,6 @@ export VT_REDIS_HOST=$PS_VT_REDIS_HOST
 export VT_REDIS_PORT=$PS_VT_REDIS_PORT
 
 #Start PM2
-cd ~/node-application/video-recording-with-webrtc/
+cd /home/ec2-user/node-applications/video-recording-with-webrtc
 npm run pm2_stop
 npm run pm2_start
