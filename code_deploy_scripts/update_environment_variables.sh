@@ -43,7 +43,8 @@ cd $APPLICATION_LOCATION
 # ---------------------
 PS_REGION=ap-southeast-1
 
-PS_NODE_ENV=$(aws ssm get-parameters --region $PS_REGION --names video-interview-poc.dev.NODE_ENV --with-decryption --query Parameters[0].Value)
+export PS_NODE_ENV=$(aws ssm get-parameters --region $PS_REGION --names video-interview-poc.dev.NODE_ENV --with-decryption --query Parameters[0].Value)
+
 
 # ------------------------------------------
 # Deployment Group Specific Environments
@@ -56,20 +57,20 @@ if [ "$DEPLOYMENT_GROUP_NAME" == "video-interview-POC-Deploy-Group-Dev" ]; then
 	REDIS_DOCKER_PORT=16379
 
 	#Check if redis docker exists
-	if [ ! "$(docker ps -q -f name=$REDIS_DOCKER_NAME)" ]; then
-		# cleanup
-		docker rm -f $REDIS_DOCKER_NAME
-	fi
+	# if [ ! "$(docker ps -q -f name=$REDIS_DOCKER_NAME)" ]; then
+	# 	# cleanup
+	# 	docker rm -f $REDIS_DOCKER_NAME
+	# fi
 
 	#start
 	docker run --name $REDIS_DOCKER_NAME -p $REDIS_DOCKER_PORT:6379 -d redis:3.2.4
 
-	PS_VT_REDIS_HOST=127.0.0.1
-	PS_VT_REDIS_PORT=16379
+	export PS_VT_REDIS_HOST=127.0.0.1
+	export PS_VT_REDIS_PORT=16379
 else
 	#Get Redis Config from stored parameters
-	PS_VT_REDIS_HOST="SET REDIS HOST FOR PROD HERE"
-	PS_VT_REDIS_PORT="SET REDIS PORT FOR PROD HERE"
+	export PS_VT_REDIS_HOST="SET REDIS HOST FOR PROD HERE"
+	export PS_VT_REDIS_PORT="SET REDIS PORT FOR PROD HERE"
 fi
 
 # ---------------------
