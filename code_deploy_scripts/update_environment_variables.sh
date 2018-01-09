@@ -53,17 +53,26 @@ export USE_DOCKER_FOR_REDIS="false"
 # ------------------------------------------
 # Deployment Group Specific Environments (Development)
 # ------------------------------------------
-if [ "$DEPLOYMENT_GROUP_NAME" == "video-interview-POC-Deploy-Group-Dev" ]; then
+if [ "$DEPLOYMENT_GROUP_NAME" == "development" ]; then
 	export USE_DOCKER_FOR_REDIS="true"
 	export PS_NODE_ENV_NAME="video-interview-poc.dev.NODE_ENV"
 fi
 # ------------------------------------------
-# Deployment Group Specific Environments (Stage)
+# Deployment Group Specific Environments (Staging)
 # ------------------------------------------
-if [ "$DEPLOYMENT_GROUP_NAME" == "video-interview-POC-Deploy-Group-Stage" ]; then
-	export PS_NODE_ENV_NAME="video-interview-poc.stage.NODE_ENV"
-	export PS_REDIS_HOST_NAME="video-interview-poc.stage.redis.host"
-	export PS_REDIS_PORT_NAME="video-interview-poc.stage.redis.port"
+if [ "$DEPLOYMENT_GROUP_NAME" == "staging" ]; then
+	export PS_NODE_ENV_NAME="video-interview-poc.staging.NODE_ENV"
+	export PS_REDIS_HOST_NAME="video-interview-poc.staging.redis.host"
+	export PS_REDIS_PORT_NAME="video-interview-poc.staging.redis.port"
+fi
+# ------------------------------------------
+# Deployment Group Specific Environments (Production)
+# ------------------------------------------
+if [ "$DEPLOYMENT_GROUP_NAME" == "production" ]; then
+	export USE_DOCKER_FOR_REDIS="true"
+	export PS_NODE_ENV_NAME="video-interview-poc.prod.NODE_ENV"
+	export PS_REDIS_HOST_NAME="video-interview-poc.prod.redis.host"
+	export PS_REDIS_PORT_NAME="video-interview-poc.prod.redis.port"
 fi
 
 # ------------------------------------------
