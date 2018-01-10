@@ -13,24 +13,34 @@ export BUILD_BASH_PROFILE_LOCATION=/home/ec2-user/.bash_profile
 rm -rf $BUILD_BASH_PROFILE_LOCATION
 touch $BUILD_BASH_PROFILE_LOCATION
 
+#Add bin bash to Bash profile
+echo "#!/bin/bash" >> $BUILD_BASH_PROFILE_LOCATION
+
+
 # ---------------------
 # Utilities
 # ---------------------
 
 # Will be used to automatically update environment variables
+# set_environment_variable_to_bash_profile(){
+# 	local variable_name=$1
+# 	local variable_value=$2
+
+# 	hasEnv=`grep "export $variable_name" /home/ec2-user/.bash_profile | cat`
+# 	if [ -z "$hasEnv" ]; then
+#    		echo "export $variable_name=$variable_value" >> /home/ec2-user/.bash_profile
+# 		source /home/ec2-user/.bash_profile
+# 	else
+#         local old_variable_content=${!variable_name}
+#         sed -i "/export $variable_name=\b/c\export $variable_name=$variable_value" /home/ec2-user/.bash_profile
+# 		source /home/ec2-user/.bash_profile	    
+# 	fi
+# }
+
 set_environment_variable_to_bash_profile(){
 	local variable_name=$1
 	local variable_value=$2
-
-	hasEnv=`grep "export $variable_name" /home/ec2-user/.bash_profile | cat`
-	if [ -z "$hasEnv" ]; then
-   		echo "export $variable_name=$variable_value" >> /home/ec2-user/.bash_profile
-		source /home/ec2-user/.bash_profile
-	else
-        local old_variable_content=${!variable_name}
-        sed -i "/export $variable_name=\b/c\export $variable_name=$variable_value" /home/ec2-user/.bash_profile
-		source /home/ec2-user/.bash_profile	    
-	fi
+	echo "export $variable_name=$variable_value" >> $BUILD_BASH_PROFILE_LOCATION
 }
 
 # --------
@@ -61,9 +71,9 @@ fi
 # Deployment Group Specific Environments (Staging)
 # ------------------------------------------
 if [ "$DEPLOYMENT_GROUP_NAME" == "staging" ]; then
-	export PS_NODE_ENV_NAME="video-interview-poc.staging.NODE_ENV"
-	export PS_REDIS_HOST_NAME="video-interview-poc.staging.redis.host"
-	export PS_REDIS_PORT_NAME="video-interview-poc.staging.redis.port"
+	export PS_NODE_ENV_NAME="video-interview-poc.stage.NODE_ENV"
+	export PS_REDIS_HOST_NAME="video-interview-poc.stage.redis.host"
+	export PS_REDIS_PORT_NAME="video-interview-poc.stage.redis.port"
 fi
 # ------------------------------------------
 # Deployment Group Specific Environments (Production)
@@ -84,6 +94,7 @@ export PS_NODE_ENV_VALUE=$(aws ssm get-parameters --region $PS_REGION --names $P
 export PS_REDIS_HOST_VALUE=""
 export PS_REDIS_PORT_VALUE=""
 
+# Will Create a Local Redis Container from Docker
 if [ "$USE_DOCKER_FOR_REDIS" == "true" ]; then
 	# ------------
 	# Create a docker component for redis
@@ -110,15 +121,11 @@ fi
 # SET VARIABLES
 # ---------------------
 
-source $BUILD_BASH_PROFILE_LOCATION #REFRESH 
-
 set_environment_variable_to_bash_profile "BUILD_DEPLOYMENT_GROUP_NAME" $DEPLOYMENT_GROUP_NAME
 set_environment_variable_to_bash_profile "APPLICATION_DIRECTORY" $APPLICATION_LOCATION
 set_environment_variable_to_bash_profile "NODE_ENV" $PS_NODE_ENV_VALUE
 set_environment_variable_to_bash_profile "VT_REDIS_HOST" $PS_REDIS_HOST_VALUE
 set_environment_variable_to_bash_profile "VT_REDIS_PORT" $PS_REDIS_PORT_VALUE
-
-source $BUILD_BASH_PROFILE_LOCATION #REFRESH
 
 # add node to startup
 hasRc=`grep "su -l $USER" /etc/rc.d/rc.local | cat`
