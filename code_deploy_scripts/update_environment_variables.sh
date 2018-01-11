@@ -16,22 +16,6 @@ export BUILD_BASH_PROFILE_LOCATION=/home/ec2-user/.bash_profile
 # Utilities
 # ---------------------
 
-# Will be used to automatically update environment variables
-# set_environment_variable_to_bash_profile(){
-# 	local variable_name=$1
-# 	local variable_value=$2
-
-# 	hasEnv=`grep "export $variable_name" /home/ec2-user/.bash_profile | cat`
-# 	if [ -z "$hasEnv" ]; then
-#    		echo "export $variable_name=$variable_value" >> /home/ec2-user/.bash_profile
-# 		source /home/ec2-user/.bash_profile
-# 	else
-#         local old_variable_content=${!variable_name}
-#         sed -i "/export $variable_name=\b/c\export $variable_name=$variable_value" /home/ec2-user/.bash_profile
-# 		source /home/ec2-user/.bash_profile	    
-# 	fi
-# }
-
 #Rebuild Bash Profile
 rm -rf $BUILD_BASH_PROFILE_LOCATION #Remove Bash Profile
 touch $BUILD_BASH_PROFILE_LOCATION #Create Bash Profile
@@ -67,27 +51,28 @@ export USE_DOCKER_FOR_REDIS="false"
 # Deployment Group Specific Environments (Development)
 # ------------------------------------------
 if [ "$DEPLOYMENT_GROUP_NAME" == "development" ]; then
-	# export USE_DOCKER_FOR_REDIS="true"
+	export USE_DOCKER_FOR_REDIS="true" #Comment if AWS Elasticache Redis is implemented
 	export PS_NODE_ENV_NAME="video-interview-poc.dev.NODE_ENV"
-	export PS_REDIS_HOST_NAME="video-interview-poc.dev.redis.host"
-	export PS_REDIS_PORT_NAME="video-interview-poc.dev.redis.port"	
+	# export PS_REDIS_HOST_NAME="video-interview-poc.dev.redis.host" #Comment out AWS Elasticache Redis is implemented
+	# export PS_REDIS_PORT_NAME="video-interview-poc.dev.redis.port" #Comment out AWS Elasticache Redis is implemented	 
 fi
 # ------------------------------------------
 # Deployment Group Specific Environments (Staging)
 # ------------------------------------------
 if [ "$DEPLOYMENT_GROUP_NAME" == "staging" ]; then
+	export USE_DOCKER_FOR_REDIS="true" #Comment if AWS Elasticache Redis is implemented
 	export PS_NODE_ENV_NAME="video-interview-poc.stage.NODE_ENV"
-	export PS_REDIS_HOST_NAME="video-interview-poc.stage.redis.host"
-	export PS_REDIS_PORT_NAME="video-interview-poc.stage.redis.port"
+	# export PS_REDIS_HOST_NAME="video-interview-poc.stage.redis.host" #Comment out AWS Elasticache Redis is implemented
+	# export PS_REDIS_PORT_NAME="video-interview-poc.stage.redis.port" #Comment out AWS Elasticache Redis is implemented
 fi
 # ------------------------------------------
 # Deployment Group Specific Environments (Production)
 # ------------------------------------------
 if [ "$DEPLOYMENT_GROUP_NAME" == "production" ]; then
-	export USE_DOCKER_FOR_REDIS="true"
+	export USE_DOCKER_FOR_REDIS="true" #Comment if AWS Elasticache Redis is implemented
 	export PS_NODE_ENV_NAME="video-interview-poc.prod.NODE_ENV"
-	export PS_REDIS_HOST_NAME="video-interview-poc.prod.redis.host"
-	export PS_REDIS_PORT_NAME="video-interview-poc.prod.redis.port"
+	# export PS_REDIS_HOST_NAME="video-interview-poc.prod.redis.host" #Comment out AWS Elasticache Redis is implemented
+	# export PS_REDIS_PORT_NAME="video-interview-poc.prod.redis.port" #Comment out AWS Elasticache Redis is implemented
 fi
 
 # ------------------------------------------
