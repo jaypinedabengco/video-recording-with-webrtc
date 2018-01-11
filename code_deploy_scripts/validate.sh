@@ -9,8 +9,7 @@ APPLICATION_PORT=8081
 nc -zv $APPLICATION_HOST $APPLICATION_PORT
 
 #UPDATE Environment Variable
-cp /home/ec2-user/.bash_profile update_env_variable_for_testing.sh
-source update_env_variable_for_testing.sh
+source /home/ec2-user/.bash_profile
 
 #RUN Unit Test
 cd /home/ec2-user/node-applications/video-recording-with-webrtc
