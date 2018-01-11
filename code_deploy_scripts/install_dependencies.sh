@@ -7,4 +7,5 @@ yum -y install jq #for JSON Parsing
 
 #Install PM2
 npm install -g pm2
+npm install -g mocha
 pm2 update
