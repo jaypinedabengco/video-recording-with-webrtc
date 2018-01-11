@@ -69,8 +69,8 @@ export USE_DOCKER_FOR_REDIS="false"
 if [ "$DEPLOYMENT_GROUP_NAME" == "development" ]; then
 	# export USE_DOCKER_FOR_REDIS="true"
 	export PS_NODE_ENV_NAME="video-interview-poc.dev.NODE_ENV"
-	export PS_REDIS_HOST_NAME="video-interview-poc.stage.redis.host"
-	export PS_REDIS_PORT_NAME="video-interview-poc.stage.redis.port"
+	export PS_REDIS_HOST_NAME="video-interview-poc.dev.redis.host"
+	export PS_REDIS_PORT_NAME="video-interview-poc.dev.redis.port"	
 fi
 # ------------------------------------------
 # Deployment Group Specific Environments (Staging)
