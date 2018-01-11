@@ -1,6 +1,6 @@
 #!/bin/sh -e
 
-sleep 30
+sleep 10
 
 APPLICATION_HOST=127.0.0.1
 APPLICATION_PORT=8081
