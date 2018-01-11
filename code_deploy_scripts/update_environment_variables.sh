@@ -67,14 +67,15 @@ export USE_DOCKER_FOR_REDIS="false"
 # Deployment Group Specific Environments (Development)
 # ------------------------------------------
 if [ "$DEPLOYMENT_GROUP_NAME" == "development" ]; then
-	export USE_DOCKER_FOR_REDIS="true"
+	# export USE_DOCKER_FOR_REDIS="true"
 	export PS_NODE_ENV_NAME="video-interview-poc.dev.NODE_ENV"
+	export PS_REDIS_HOST_NAME="video-interview-poc.stage.redis.host"
+	export PS_REDIS_PORT_NAME="video-interview-poc.stage.redis.port"
 fi
 # ------------------------------------------
 # Deployment Group Specific Environments (Staging)
 # ------------------------------------------
 if [ "$DEPLOYMENT_GROUP_NAME" == "staging" ]; then
-	export USE_DOCKER_FOR_REDIS="true"
 	export PS_NODE_ENV_NAME="video-interview-poc.stage.NODE_ENV"
 	export PS_REDIS_HOST_NAME="video-interview-poc.stage.redis.host"
 	export PS_REDIS_PORT_NAME="video-interview-poc.stage.redis.port"

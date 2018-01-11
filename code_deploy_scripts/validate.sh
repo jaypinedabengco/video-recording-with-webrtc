@@ -1,7 +1,9 @@
 #!/bin/sh -e
-
 sleep 10
 
+#CONFIGURATIONS
+BASH_PROFILE_LOCATION=/home/ec2-user/.bash_profile
+APPLICATION_DIRECTORY=/home/ec2-user/node-applications/video-recording-with-webrtc
 APPLICATION_HOST=127.0.0.1
 APPLICATION_PORT=8081
 
@@ -9,10 +11,10 @@ APPLICATION_PORT=8081
 nc -zv $APPLICATION_HOST $APPLICATION_PORT
 
 #UPDATE Environment Variable
-source /home/ec2-user/.bash_profile
+source $BASH_PROFILE_LOCATION
 
 #RUN Unit Test
-cd /home/ec2-user/node-applications/video-recording-with-webrtc
+cd $APPLICATION_DIRECTORY
 npm test
 
 ## VALIDATE HEALTHCHECK
