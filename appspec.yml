@@ -31,3 +31,7 @@ hooks:
     - location: code_deploy_scripts/stop_server.sh
       timeout: 300
       runas: ec2-user
+  ValidateService:
+    - location: code_deploy_scripts/validate.sh
+      timeout: 300
+      runas: ec2-user

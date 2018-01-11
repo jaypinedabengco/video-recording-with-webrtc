@@ -131,7 +131,9 @@ set_environment_variable_to_bash_profile "NODE_ENV" $PS_NODE_ENV_VALUE
 set_environment_variable_to_bash_profile "VT_REDIS_HOST" $PS_REDIS_HOST_VALUE
 set_environment_variable_to_bash_profile "VT_REDIS_PORT" $PS_REDIS_PORT_VALUE
 
-# add node to startup
+# add node to startup 
+# will also refresh environment variable on bash profile
+# because refresh is on the start_server.sh script
 hasRc=`grep "su -l $USER" /etc/rc.d/rc.local | cat`
 if [ -z "$hasRc" ]; then
     sudo sh -c "echo 'su -l $USER -c \"cd ~/node-applications/video-recording-with-webrtc;sh ./start_server.sh\"' >> /etc/rc.d/rc.local"
