@@ -10,11 +10,6 @@ set -e
 # ------------------------
 export APPLICATION_LOCATION=/home/ec2-user/node-applications/video-recording-with-webrtc
 export BUILD_BASH_PROFILE_LOCATION=/home/ec2-user/.bash_profile
-rm -rf $BUILD_BASH_PROFILE_LOCATION
-touch $BUILD_BASH_PROFILE_LOCATION
-
-#Add bin bash to Bash profile
-echo "#!/bin/bash" >> $BUILD_BASH_PROFILE_LOCATION
 
 
 # ---------------------
@@ -37,6 +32,14 @@ echo "#!/bin/bash" >> $BUILD_BASH_PROFILE_LOCATION
 # 	fi
 # }
 
+#Rebuild Bash Profile
+rm -rf $BUILD_BASH_PROFILE_LOCATION #Remove Bash Profile
+touch $BUILD_BASH_PROFILE_LOCATION #Create Bash Profile
+
+#Add initial content to Bash profile
+echo "#!/bin/bash" >> $BUILD_BASH_PROFILE_LOCATION
+
+# Tool for setting environment variable to Bash profile
 set_environment_variable_to_bash_profile(){
 	local variable_name=$1
 	local variable_value=$2
@@ -121,7 +124,8 @@ fi
 # SET VARIABLES
 # ---------------------
 
-set_environment_variable_to_bash_profile "BUILD_DEPLOYMENT_GROUP_NAME" $DEPLOYMENT_GROUP_NAME
+set_environment_variable_to_bash_profile "AWS_BUILD_DEPLOYMENT_GROUP_NAME" $DEPLOYMENT_GROUP_NAME
+set_environment_variable_to_bash_profile "AWS_BUILD_DEPLOYMENT_ID" $DEPLOYMENT_ID
 set_environment_variable_to_bash_profile "APPLICATION_DIRECTORY" $APPLICATION_LOCATION
 set_environment_variable_to_bash_profile "NODE_ENV" $PS_NODE_ENV_VALUE
 set_environment_variable_to_bash_profile "VT_REDIS_HOST" $PS_REDIS_HOST_VALUE
