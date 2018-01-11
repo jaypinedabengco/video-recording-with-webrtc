@@ -10,6 +10,8 @@ nc -zv $APPLICATION_HOST $APPLICATION_PORT
 
 cd /home/ec2-user/node-applications/video-recording-with-webrtc
 
+source cd /home/ec2-user/.bash_profile #Refresh Bash Profile
+
 npm test
 
 ## VALIDATE HEALTHCHECK
