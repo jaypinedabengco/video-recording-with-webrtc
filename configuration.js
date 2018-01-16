@@ -36,6 +36,13 @@ const CONFIGURATION = {
     http_port: process.env.HTTP_PORT || 8081, 
     https_port: process.env.HTTPS_PORT || 8444,
     jwt_secret_key: process.env.JWT_SECRET_KEY || 'ABCD123', 
+    db: {
+        host: process.env.VT_DB_HOST, 
+        username: process.env.VT_DB_USERNAME, 
+        password: process.env.VT_DB_PASSWORD, 
+        name: process.env.VT_DB_NAME, 
+        port: process.env.VT_DB_PORT,
+    },
     redis: {
         host: REDIS_HOST, 
         port: REDIS_PORT

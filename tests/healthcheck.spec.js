@@ -30,6 +30,10 @@ describe('healthcheck service', () => {
       return healthcheck.checkHealth().then((health) => expect(health.redis.status).to.equal(1));
     });    
 
+    it('should have value of "1" to db.status', () => {
+      return healthcheck.checkHealth().then((health) => expect(health.db.status).to.equal(1));
+    });     
+
   });
 
 });
