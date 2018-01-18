@@ -93,7 +93,7 @@ if [ "$USE_DOCKER_FOR_REDIS" == "true" ]; then
 	REDIS_DOCKER_PORT=6379
 
 	#Check if redis docker exists, then remove
-	if [ "$(docker ps -q -f name=$REDIS_DOCKER_NAME)" ]; then
+	if [ "$(docker ps -q -a -f name=$REDIS_DOCKER_NAME)" ]; then
 		docker rm -f $REDIS_DOCKER_NAME
 	fi
 
