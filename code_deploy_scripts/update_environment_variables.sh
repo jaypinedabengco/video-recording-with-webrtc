@@ -139,5 +139,5 @@ set_environment_variable_to_bash_profile "VT_DB_PORT" 3306
 # because refresh is on the start_server.sh script
 hasRc=`grep "su -l $USER" /etc/rc.d/rc.local | cat`
 if [ -z "$hasRc" ]; then
-    sudo sh -c "echo 'su -l $USER -c \"cd ~/node-applications/video-recording-with-webrtc;sh ./start_server.sh\"' >> /etc/rc.d/rc.local"
+    sudo sh -c "echo 'su -l $USER -c \"cd ~/node-applications/video-recording-with-webrtc;sh ./.code_deploy_scripts/start_server.sh\"' >> /etc/rc.d/rc.local"
 fi
