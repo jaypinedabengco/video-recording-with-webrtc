@@ -10,6 +10,9 @@ source $BASH_LOCATION
 
 #Start PM2
 cd /home/ec2-user/node-applications/video-recording-with-webrtc 
+
+#remove test
+rm test-results.xml 
 npm test &&
 npm run pm2_stop &&
 npm run pm2_start
