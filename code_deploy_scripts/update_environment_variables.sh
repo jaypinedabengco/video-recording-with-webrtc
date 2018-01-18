@@ -44,7 +44,11 @@ cd $APPLICATION_LOCATION
 export PS_REGION="ap-southeast-1"
 export PS_REDIS_HOST_NAME=""
 export PS_REDIS_PORT_NAME=""
-export PS_NODE_ENV_NAME=""
+export PS_NODE_ENV_NAME="video-interview-poc.dev.NODE_ENV"
+export PS_DB_HOST_NAME="video-interview-poc.dev.DB_HOST"
+export PS_DB_USER_NAME="video-interview-poc.dev.DB_USER"
+export PS_DB_PASSWORD_NAME="video-interview-poc.dev.DB_PASSWORD"
+export PS_DB_NAME_NAME="video-interview-poc.dev.DB_NAME"
 export USE_DOCKER_FOR_REDIS="false"
 
 # ------------------------------------------
@@ -52,9 +56,6 @@ export USE_DOCKER_FOR_REDIS="false"
 # ------------------------------------------
 if [ "$DEPLOYMENT_GROUP_NAME" == "development" ]; then
 	export USE_DOCKER_FOR_REDIS="true" #Comment if AWS Elasticache Redis is implemented
-	export PS_NODE_ENV_NAME="video-interview-poc.dev.NODE_ENV"
-	# export PS_REDIS_HOST_NAME="video-interview-poc.dev.redis.host" #Comment out AWS Elasticache Redis is implemented
-	# export PS_REDIS_PORT_NAME="video-interview-poc.dev.redis.port" #Comment out AWS Elasticache Redis is implemented	 
 fi
 # ------------------------------------------
 # Deployment Group Specific Environments (Staging)
@@ -62,8 +63,10 @@ fi
 if [ "$DEPLOYMENT_GROUP_NAME" == "staging" ]; then
 	export USE_DOCKER_FOR_REDIS="true" #Comment if AWS Elasticache Redis is implemented
 	export PS_NODE_ENV_NAME="video-interview-poc.stage.NODE_ENV"
-	# export PS_REDIS_HOST_NAME="video-interview-poc.stage.redis.host" #Comment out AWS Elasticache Redis is implemented
-	# export PS_REDIS_PORT_NAME="video-interview-poc.stage.redis.port" #Comment out AWS Elasticache Redis is implemented
+	export PS_DB_HOST_NAME="video-interview-poc.stage.DB_HOST"
+	export PS_DB_USER_NAME="video-interview-poc.stage.DB_USER"
+	export PS_DB_PASSWORD_NAME="video-interview-poc.stage.DB_PASSWORD"
+	export PS_DB_NAME_NAME="video-interview-poc.stage.DB_NAME"	
 fi
 # ------------------------------------------
 # Deployment Group Specific Environments (Production)
@@ -71,14 +74,20 @@ fi
 if [ "$DEPLOYMENT_GROUP_NAME" == "production" ]; then
 	export USE_DOCKER_FOR_REDIS="true" #Comment if AWS Elasticache Redis is implemented
 	export PS_NODE_ENV_NAME="video-interview-poc.prod.NODE_ENV"
-	# export PS_REDIS_HOST_NAME="video-interview-poc.prod.redis.host" #Comment out AWS Elasticache Redis is implemented
-	# export PS_REDIS_PORT_NAME="video-interview-poc.prod.redis.port" #Comment out AWS Elasticache Redis is implemented
+	export PS_DB_HOST_NAME="video-interview-poc.prod.DB_HOST"
+	export PS_DB_USER_NAME="video-interview-poc.prod.DB_USER"
+	export PS_DB_PASSWORD_NAME="video-interview-poc.prod.DB_PASSWORD"
+	export PS_DB_NAME_NAME="video-interview-poc.prod.DB_NAME"		
 fi
 
 # ------------------------------------------
 # GET CONTENTS FROM AWS Parameter Store
 # ------------------------------------------
 export PS_NODE_ENV_VALUE=$(aws ssm get-parameters --region $PS_REGION --names $PS_NODE_ENV_NAME --with-decryption --query Parameters[0].Value)
+export PS_DB_HOST_VALUE=$(aws ssm get-parameters --region $PS_REGION --names $PS_DB_HOST_NAME --with-decryption --query Parameters[0].Value)
+export PS_DB_USER_VALUE=$(aws ssm get-parameters --region $PS_REGION --names $PS_DB_USER_NAME --with-decryption --query Parameters[0].Value)
+export PS_DB_PASSWORD_VALUE=$(aws ssm get-parameters --region $PS_REGION --names $PS_DB_PASSWORD_NAME --with-decryption --query Parameters[0].Value)
+export PS_DB_NAME_VALUE=$(aws ssm get-parameters --region $PS_REGION --names $PS_DB_NAME_NAME --with-decryption --query Parameters[0].Value)	
 
 # Check if Docker is via AWS CACHE or just create a docker container locally
 export PS_REDIS_HOST_VALUE=""
@@ -108,7 +117,7 @@ else
 fi
 
 # ---------------------
-# SET VARIABLES
+# SET VALUES TO BASH PROFILE
 # ---------------------
 
 set_environment_variable_to_bash_profile "AWS_BUILD_DEPLOYMENT_GROUP_NAME" $DEPLOYMENT_GROUP_NAME
@@ -117,6 +126,13 @@ set_environment_variable_to_bash_profile "APPLICATION_DIRECTORY" $APPLICATION_LO
 set_environment_variable_to_bash_profile "NODE_ENV" $PS_NODE_ENV_VALUE
 set_environment_variable_to_bash_profile "VT_REDIS_HOST" $PS_REDIS_HOST_VALUE
 set_environment_variable_to_bash_profile "VT_REDIS_PORT" $PS_REDIS_PORT_VALUE
+
+#DB
+set_environment_variable_to_bash_profile "VT_DB_HOST" $PS_DB_HOST_VALUE
+set_environment_variable_to_bash_profile "VT_DB_USERNAME" $PS_DB_USER_VALUE
+set_environment_variable_to_bash_profile "VT_DB_PASSWORD" $PS_DB_PASSWORD_VALUE
+set_environment_variable_to_bash_profile "VT_DB_NAME" $PS_DB_NAME_VALUE
+set_environment_variable_to_bash_profile "VT_DB_PORT" 3306
 
 # add node to startup 
 # will also refresh environment variable on bash profile

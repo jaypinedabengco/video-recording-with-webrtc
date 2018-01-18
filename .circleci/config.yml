@@ -76,12 +76,12 @@ jobs:
           key: bower-cache-1-{{ checksum "bower.json" }}
           paths: 
             - public/bower_components
-      # - run: 
-      #     name: Do Unit Test
-      #     command: npm test
-      # - run:
-      #     name: Test Deploy to PM2
-      #     command: npm run pm2_start
+      - run: 
+          name: Do Unit Test
+          command: npm test
+      - run:
+          name: Test Deploy to PM2
+          command: npm run pm2_start
       - run: 
           name: Add Environment Variables for Code Deploy
           command: |

@@ -41,7 +41,7 @@ const CONFIGURATION = {
         username: process.env.VT_DB_USERNAME, 
         password: process.env.VT_DB_PASSWORD, 
         name: process.env.VT_DB_NAME, 
-        port: process.env.VT_DB_PORT,
+        port: process.env.VT_DB_PORT || 3306,
     },
     redis: {
         host: REDIS_HOST, 
