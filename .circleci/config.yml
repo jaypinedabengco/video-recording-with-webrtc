@@ -78,7 +78,9 @@ jobs:
             - public/bower_components
       - run: 
           name: Do Unit Test
-          command: npm test
+          command: | 
+            npm test && 
+            rm test-results.xml
       - run:
           name: Test Deploy to PM2
           command: npm run pm2_start
