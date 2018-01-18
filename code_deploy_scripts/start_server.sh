@@ -9,6 +9,7 @@ echo "HELLO=$DEPLOYMENT_GROUP_NAME" >> $BASH_LOCATION
 source $BASH_LOCATION
 
 #Start PM2
-cd /home/ec2-user/node-applications/video-recording-with-webrtc
-npm run pm2_stop
+cd /home/ec2-user/node-applications/video-recording-with-webrtc 
+npm test &&
+npm run pm2_stop && 
 npm run pm2_start
