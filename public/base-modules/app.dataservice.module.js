@@ -1,86 +1,77 @@
-'use strict';
-(function(){
-     angular
-        .module('app.dataservice.module', [])
-		.service('apiDataService', [ '$http', '$q', ApiDataService])
+(function () {
+	'use strict';
+
+	angular
+		.module('app.dataservice.module', [])
+		.service('app.dataservice.persistent-storage-manager', PersistentStorageManager)
 		;
 
 	/**
 	 * 
 	 */
-	function ApiDataService($http, $q){
-		
-		var services = {	
-			post : post,
-			get : get
-		}
+	PersistentStorageManager.$inject = ['localStorageService'];
+	function PersistentStorageManager(localStorageService) {
+
+		var services = {
+			set: set,
+			get: get,
+			remove: remove,
+			setCookie: setCookie,
+			getCookie: getCookie,
+			removeCookie: removeCookie
+		};
 
 		return services;
 
-		/////
-
-        /**
-         * 
-         * @param {*} api_url 
-         * @param {*} data 
-         * @param {*} auth_token 
-         */
-		function post(api_url, data, auth_token){
-			return doRequest(api_url, 'POST', data, auth_token);			
+		/**
+		 * 
+		 * @param {*} key 
+		 * @param {*} value 
+		 */
+		function set(key, value) {
+			return localStorageService.set(key, value);
 		}
 
-        /**
-         * 
-         * @param {*} api_url 
-         * @param {*} auth_token 
-         */
-		function get(api_url, auth_token){
-			return doRequest(api_url, 'GET', {}, auth_token);
-		}		
+		/**
+		 * 
+		 * @param {*} key 
+		 */
+		function get(key) {
+			return localStorageService.get(key);
+		}
 
-        /**
-         * 
-         * @param {*} api_url 
-         * @param {*} method 
-         * @param {*} data 
-         * @param {*} auth_token 
-         */
-		function doRequest(api_url, method, data, auth_token){
+		/**
+		 * 
+		 * @param {*} key 
+		 */
+		function remove(key) {
+			return localStorageService.remove(key);
+		}
 
-			var _method = (method && method.toLowerCase() == 'post')?'POST':'GET';
+		/**
+		 * 
+		 * @param {*} key 
+		 * @param {*} value 
+		 * @param {*} expiration_in_days 
+		 */
+		function setCookie(key, value, expiration_in_days) {
+			return localStorageService.cookie.set(key, value, expiration_in_days, true);
+		}
 
-            //build options
-			var _options = {
-				method : _method, 
-				url : api_url,
-				headers : {
-					'Content-Type': 'application/json',
-				}, 
-				data : data
-			};
+		/**
+		 * 
+		 * @param {*} key 
+		 */
+		function getCookie(key) {
+			return localStorageService.cookie.get(key);
+		}
 
-			if ( auth_token )
-				_options.headers['x-access-token'] = auth_token;
-
-			var deffered = $q.defer();
-
-			$http(_options).then(
-				function(response){
-					var _response_data = response.data;
-					if ( _response_data.success ){
-						deffered.resolve(_response_data);
-					} else {
-						deffered.reject(_response_data);							
-					}	
-				}, 
-				function(response){
-					var _response_data = response.data;
-					deffered.reject(_response_data);
-				}
-			);
-
-			return deffered.promise;
-		}					
-	};	     
-    
+		/**
+		 * 
+		 * @param {*} key 
+		 */
+		function removeCookie(key) {
+			return localStorageService.cookie.remove(key);
+		}
+	}
 })();

@@ -63,7 +63,7 @@
 						function(error){
 							console.log('error', error);
 						}
-					)				
+					);				
 			}
 
 			/**

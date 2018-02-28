@@ -124,7 +124,7 @@ function getAllRecordedVideos(){
                 return Promise.resolve(recorded_videos);
             })
             .catch(err => {
-                console.log(err)
+                console.log(err);
                 return err;
             });
 }
@@ -186,7 +186,7 @@ function createCloudFrontSignedCookies(){
             keypairId: cloudfront_config.keypair_id,
             privateKeyString: cloudfront_config.private_key_string,
             // expireTime: expiration
-        }
+        };
         var signed_cookies = cfsign.getSignedCookies(cloudfront_config.url_for_signed_cookies + '/*', options);
         return resolve(signed_cookies);
     }).then().catch(err => {

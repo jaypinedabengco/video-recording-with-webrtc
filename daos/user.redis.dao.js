@@ -1,11 +1,11 @@
 var redis = require('./../providers/redis');
 
 exports.authenticate = authenticate;
+exports.createUser = createUser;
 
 /////
 
 // clearRedisAndInitializeUsers();
-initializeSampleUser();
 
 function clearRedisAndInitializeUsers(){
 
@@ -20,7 +20,16 @@ function clearRedisAndInitializeUsers(){
                 redis.client.set('user1', '1');    
                 redis.client.set('user2', '2');
             }
-        )
+        );
+}
+
+/**
+ * 
+ * @param {*} username 
+ * @param {*} password 
+ */
+function createUser(username, password){
+    return redis.set(username, password);
 }
 
 /**
@@ -53,6 +62,6 @@ function authenticate(username, password){
                     return reject('Invalid username or password');
                 }, 
                 reject
-            )
+            );
     });
 }

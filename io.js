@@ -13,7 +13,6 @@ module.exports = function(server){
 
     //set authentication
     
-
     //CORS..
     // io.origins((origin, callback) => {
     //     if (origin !== 'https://foo.example.com') {
@@ -40,9 +39,11 @@ module.exports = function(server){
 
     // require('./io_namespaces/sample_01.io.namespace')('/io/sample_01', io);
     // require('./io_namespaces/sample_02.io.namespace')('/io/sample_02', io);
-    require('./io_namespaces/sample_webrtc_signal_server.io.namespace')('/io/signaling_server', io);
     // require('./io_namespaces/tag_game.io.namespace')('/io/tag_game', io);
+    // require('./io_namespaces/sample_webrtc_signal_server.io.namespace')('/io/signaling_server', io);
+    
+    require('./io_namespaces/video-interview.io.namespace')('/io/video_interview', io);
     require('./io_namespaces/simple_chat.namespace')('/io/simple_chat', io);
      
     return io;
-}
+};

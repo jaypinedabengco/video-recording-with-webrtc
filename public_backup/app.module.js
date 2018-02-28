@@ -9,7 +9,6 @@
         'ngCookies',        
         'ngMessages',
         'btford.socket-io', 
-        'LocalStorageModule',
       
         //base modules
         'app.service.module', 

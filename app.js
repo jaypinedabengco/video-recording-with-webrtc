@@ -20,8 +20,11 @@ app.use(cookieParser());
 app.use('/', express.static(path.join(__dirname, 'public')));
 app.use('/api', require('./routes/healthcheck.route'));
 app.use('/api', require('./routes/authentication.route'));
-app.use('/api', require('./routes/sample.route'));
-app.use('/api', require('./routes/sample.redis.route'));
+
+
+app.use('/api/video-interview', require('./routes/video-interview.authenticate.route'));
+app.use('/api/video-interview', require('./routes/video-interview.user.route'));
+
 app.use('/api', require('./routes/video-interview.route'));
 
 
@@ -36,26 +39,22 @@ app.use(function(req, res, next) {
 
 // error handlers
 
-// development error handler
-// will print stacktrace
-if (app.get('env') === 'development') {
-  app.use(function(err, req, res, next) {
-    res.status(err.status || 500)
-      .json({
-        message: err.message,
-        error: err
-    });
-  });
-}
-
-// production error handler
-// no stacktraces leaked to user
 app.use(function(err, req, res, next) {
+
+  //show error
+  if ( err.status != 404 ){
+    console.log(err);
+  }
+  
+  if ( res.headersSent ){ //if already sent..
+    return;
+  }
+
   res.status(err.status || 500)
     .json({
       message: err.message,
-      error: {}
-    });
+      error: err
+  });
 });
 
 

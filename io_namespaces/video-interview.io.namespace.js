@@ -1,8 +1,9 @@
 var fs = require('fs');
 
 var simple_webrtc_user_service = require('./../services/simple_webrtc.user.service'), 
-    authenticate_service = require('./../services/authenticate.service'), 
     video_interview_service = require('./../services/video-interview.service');
+
+var authenticate_helper = require('./helper/authenticate.io_namespaces.helper');
 
 /**
  * 
@@ -12,26 +13,12 @@ module.exports = function(namespace_name, io){
     var nsp = io.of(namespace_name); //initialize namespace
     
     //middleware
-    nsp.use(authenticate);
-
+    nsp.use(authenticate_helper.authenticate);
     nsp.on('connection', onConnect);
 
-    function authenticate(socket, next){
-        var auth_token = socket.handshake.query.auth_token;
-        if ( !auth_token ){
-            console.error('CONNECT_FAILED', 'No Auth token');
-            return socket.emit('connect_failed', 'No Auth token');
-        }
+    /////
 
-        authenticate_service
-            .verifyAndDecodeToken(auth_token)
-            .then(
-                (logged_user_info) => {
-                    socket.logged_user_info = logged_user_info;
-                    next(); //move next if successful
-                }
-            ).catch(err => console.error('CONNECT_FAILED', err));
-    }
+
     /**
      * 
      * @param {*} socket 

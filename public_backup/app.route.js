@@ -24,7 +24,7 @@
           template: '<simple-chat></simple-chat>'
         })
         .when('/simple-webrtc', {
-          template: '<video-interview-with-webrtc></video-interview-with-webrtc>'
+          template: '<simple-webrtc></simple-webrtc>'
         })
         .when('/simple-webrtc/recorded-videos', {
           template: '<recorded-videos-list></recorded-videos-list>'
