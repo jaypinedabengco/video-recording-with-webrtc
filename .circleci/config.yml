@@ -106,13 +106,13 @@ jobs:
               --application-name $AWS_CODE_DEPLOY_APPLICATION_NAME \
               --s3-location s3://$AWS_CODE_DEPLOY_S3_BUCKET/$CODE_DEPLOY_FILENAME \
               --ignore-hidden-files
-      # - run: 
-      #     name: Code Deploy - Deploy Application
-      #     command: |
-            # echo "CODE_DEPLOY Filename $CODE_DEPLOY_FILENAME"
-            # aws deploy create-deployment \
-            #   --ignore-application-stop-failures \
-            #   --application-name $AWS_CODE_DEPLOY_APPLICATION_NAME \
-            #   --deployment-config-name CodeDeployDefault.OneAtATime \
-            #   --deployment-group-name $AWS_CODE_DEPLOY_DEPLOYMENT_GROUP_NAME \
-            #   --s3-location bucket=$AWS_CODE_DEPLOY_S3_BUCKET,bundleType=zip,key=$CODE_DEPLOY_FILENAME          
+      - run: 
+          name: Code Deploy - Deploy Application
+          command: |
+            echo "CODE_DEPLOY Filename $CODE_DEPLOY_FILENAME"
+            aws deploy create-deployment \
+              --ignore-application-stop-failures \
+              --application-name $AWS_CODE_DEPLOY_APPLICATION_NAME \
+              --deployment-config-name CodeDeployDefault.OneAtATime \
+              --deployment-group-name $AWS_CODE_DEPLOY_DEPLOYMENT_GROUP_NAME \
+              --s3-location bucket=$AWS_CODE_DEPLOY_S3_BUCKET,bundleType=zip,key=$CODE_DEPLOY_FILENAME          

@@ -44,18 +44,23 @@ cd $APPLICATION_LOCATION
 export PS_REGION="ap-southeast-1"
 export PS_REDIS_HOST_NAME=""
 export PS_REDIS_PORT_NAME=""
-export PS_NODE_ENV_NAME="video-interview-poc.dev.NODE_ENV"
-export PS_DB_HOST_NAME="video-interview-poc.dev.DB_HOST"
-export PS_DB_USER_NAME="video-interview-poc.dev.DB_USER"
-export PS_DB_PASSWORD_NAME="video-interview-poc.dev.DB_PASSWORD"
-export PS_DB_NAME_NAME="video-interview-poc.dev.DB_NAME"
-export USE_DOCKER_FOR_REDIS="false"
+export PS_NODE_ENV_NAME=""
+export PS_DB_HOST_NAME=""
+export PS_DB_USER_NAME=""
+export PS_DB_PASSWORD_NAME=""
+export PS_DB_NAME_NAME=""
+export USE_DOCKER_FOR_REDIS="true"
 
 # ------------------------------------------
 # Deployment Group Specific Environments (Development)
 # ------------------------------------------
 if [ "$DEPLOYMENT_GROUP_NAME" == "development" ]; then
 	export USE_DOCKER_FOR_REDIS="true" #Comment if AWS Elasticache Redis is implemented
+	export PS_NODE_ENV_NAME="video-interview-poc.dev.NODE_ENV"
+	export PS_DB_HOST_NAME="video-interview-poc.dev.DB_HOST"
+	export PS_DB_USER_NAME="video-interview-poc.dev.DB_USER"
+	export PS_DB_PASSWORD_NAME="video-interview-poc.dev.DB_PASSWORD"
+	export PS_DB_NAME_NAME="video-interview-poc.dev.DB_NAME"	
 fi
 # ------------------------------------------
 # Deployment Group Specific Environments (Staging)
