@@ -1,0 +1,89 @@
+<!doctype html>
+<html ng-app="app">
+	<head>
+    	<meta charset="utf-8">
+      <meta name="viewport" content="width=device-width,initial-scale=1">
+
+    	<title>Sample WebRTC</title>
+
+      <link rel="shortcut icon" href="favicon.ico" />      
+
+<!-- ********************************
+              * Stylesheets  *
+    ******************************** -->  
+
+      <!-- vendor -->
+      <link rel="stylesheet" href="bower_components/angular-material/angular-material.min.css">    
+      <link rel="stylesheet" href="bower_components/bootstrap/dist/css/bootstrap.min.css"/>      
+
+      <!--app-->
+      <link rel="stylesheet" href="css/app.css">
+
+      <!--components-->
+      <link rel="stylesheet" href="components/simple-webrtc/simple-webrtc.component.css">
+      <link rel="stylesheet" href="components/recorded-videos-list/recorded-videos-list.component.css">
+
+	</head>
+	
+  <body>
+
+    <!-- ********************************
+        * CONTENTS Populated HERE *
+    ******************************** -->
+
+      <div ng-view></div>
+
+<!-- ********************************
+              * Scripts  *
+    ******************************** -->  
+    <!--socket.io-->
+    <script src="/socket.io/socket.io.js"></script>
+
+    <!-- vendor -->  
+    <script src="/bower_components/angular/angular.min.js"></script>
+    <script src="/bower_components/angular-animate/angular-animate.js"></script>
+    <script src="/bower_components/angular-messages/angular-messages.js"></script>
+    <script src="/bower_components/angular-aria/angular-aria.js"></script>
+    <script src="/bower_components/angular-route/angular-route.js"></script>
+    <script src="/bower_components/angular-material/angular-material.js"></script>
+    <script src="bower_components/angular-cookies/angular-cookies.js"></script>          
+    <script src="/bower_components/angular-socket-io/socket.min.js"></script>
+    <script src="/bower_components/underscore/underscore-min.js"></script>      
+    <script src="/bower_components/dashjs/dist/dash.all.min.js"></script>  
+    
+    <!-- app -->
+    <script src="app.module.js"></script>
+    <script src="app.route.js"></script>
+
+    <!-- base modules -->  
+    <script src="base-modules/app.service.module.js"></script>
+    <script src="base-modules/app.component.module.js"></script>
+    <script src="base-modules/app.directive.module.js"></script>    
+    <script src="base-modules/app.dataservice.module.js"></script>    
+    <script src="base-modules/app.constant.module.js"></script>    
+    <script src="base-modules/app.filter.module.js"></script>    
+
+    <!-- constants -->    
+
+    <!-- services -->
+    <script src="services/socket.service.js"></script>
+    <script src="services/webrtc.service.js"></script>
+
+    <!-- dataservices -->    
+    <script src="dataservices/api.dataservice.js"></script>    
+    <script src="dataservices/authenticate.dataservice.js"></script>    
+    <script src="dataservices/webrtc.dataservice.js"></script>    
+
+    <!-- filters -->
+
+    <!-- directives -->
+      
+    <!-- components -->
+    <script src="components/sample/sample.component.js"></script>  
+    <script src="components/simple-webrtc/simple-webrtc.component.js"></script>  
+    <script src="components/tag-game/tag-game.component.js"></script>  
+    <script src="components/simple-chat/simple-chat.component.js"></script>  
+    <script src="components/recorded-videos-list/recorded-videos-list.component.js"></script>  
+          
+  </body>	
+</html>

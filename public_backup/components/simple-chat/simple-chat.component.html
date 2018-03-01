@@ -1,0 +1,101 @@
+<style>
+    li.own-message {
+        color : blue;
+    }
+
+    li.event-message {
+        color : green;
+    }
+
+    li.event-message.left-room{
+        color : red;
+    }
+
+    li.event-message .message-from{
+        display: none;
+    }
+</style>
+
+<div ng-hide="$ctrl.logged_user_info">
+    <form name="signupForm">
+        <md-input-container>
+            <label>Chat Name</label>
+            <input name="room" ng-model="$ctrl.sign_up_user.name" required>
+            <div ng-messages="signupForm.room.$error">
+                <div ng-message="required">Name is Required</div>
+            </div>
+        </md-input-container>
+        <md-button
+        class="md-raised md-primary" 
+        ng-disabled="signupForm.$invalid"
+        ng-click="$ctrl.onClickSignUp()">Signup</md-button>
+    </form>
+</div>
+
+<div ng-show="$ctrl.logged_user_info && !$ctrl.current_room">
+    <h3>Hi {{$ctrl.logged_user_info.name}}</h3>
+
+    <hr/>
+
+    <h4>Rooms</h4>    
+    <div ng-show="$ctrl.rooms_list.length">
+        <ul>
+            <li ng-repeat="room in $ctrl.rooms_list">
+                <a href="javascript:void(0);" ng-click="$ctrl.joinRoom(room)">{{room}}</a>
+            </li>
+        </ul>
+    </div>
+    <div ng-hide="$ctrl.rooms_list.length">
+        <h4>No Available Rooms</h4>
+    </div>  
+
+    <hr/>
+    
+    <div>
+        <h4>Create a Room</h4>
+        <div style="color:red" ng-show="$ctrl.show_fail_create_room_error">
+            Room named '{{room_name}}' already exists.
+        </div>
+        <form name="createRoomForm">
+            <md-input-container>
+                <label>Room Name</label>
+                <input name="roomName" ng-model="room_name" required>
+                <div ng-messages="createRoomForm.roomName.$error">
+                    <div ng-message="required">Room Name is Required</div>
+                </div>
+            </md-input-container>
+            <md-button
+            class="md-raised md-primary" 
+            ng-disabled="createRoomForm.$invalid"
+            ng-click="$ctrl.onClickCreateRoom(room_name)">Create Room</md-button>
+        </form>        
+    </div>
+</div>
+
+<div ng-show="$ctrl.current_room">
+    <div>
+        <h4>Room Name : {{$ctrl.current_room}}</h4>
+        <h4>User name : {{$ctrl.logged_user_info.name}}</h4>
+    </div>
+    <div>
+        {{$ctrl.users_in_room}}
+    </div>
+    <form name="messageForm">
+        <md-input-container>
+            <label>Message</label>
+            <input ng-model="$ctrl.message">
+        </md-input-container>
+        <md-button
+            class="md-raised md-primary" 
+            ng-click="$ctrl.sendMessageToRoom($ctrl.message)">Send</md-button>    
+    </form>
+    <div>
+        <h2 ng-hide="$ctrl.messages_within_the_room.length">No Messages yet</h2>
+        <ul ng-show="$ctrl.messages_within_the_room.length">
+            <li ng-repeat="message in $ctrl.messages_within_the_room" 
+                ng-class="{'own-message' : message.own_message, 'event-message' : message.event, 'joined-room' : message.joined_room, 'left-room' : message.left_room }">
+                <span class="message-from">[{{message.user_name}}] : </span> {{message.message}}    
+            </li>
+        </ul>
+    </div>
+</div>

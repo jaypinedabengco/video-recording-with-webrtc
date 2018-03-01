@@ -21,7 +21,8 @@
             login : login, 
             getToken : getToken, 
             isLoggedIn : isLoggedIn, 
-            logout : logout
+            logout : logout, 
+            getLoggedUserInfo : getLoggedUserInfo
 		};
 
 		return services;
@@ -36,13 +37,11 @@
          */
 		function login(username, password){
             return apiDataService
-                .post('/api/video-interview/authenticate', {username : username, password : password})
-                .then(function(result){
-
+                    .post('/api/video-interview/authenticate', {username : username, password : password})
+                .then(result => {
                     //save to persistent storage
                     var token = result.data;
                     persistentStorageManager.setCookie(token_cookie_storage_key, token, 1);
-
                     return token; //token
                 });
         }
@@ -61,7 +60,12 @@
          * 
          */
         function isLoggedIn(){
-            return !!persistentStorageManager.getCookie(token_cookie_storage_key);
+            return $q(function(resolve, reject) {
+
+                //possible validation of token here...
+                
+                return resolve(!!persistentStorageManager.getCookie(token_cookie_storage_key));
+            });
         }
         
         /**
