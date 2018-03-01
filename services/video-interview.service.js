@@ -189,7 +189,9 @@ function createCloudFrontSignedCookies(){
         };
         var signed_cookies = cfsign.getSignedCookies(cloudfront_config.url_for_signed_cookies + '/*', options);
         return resolve(signed_cookies);
-    }).then().catch(err => {
+    })
+    .then(signed_url => signed_url)
+    .catch(err => {
         console.log(err);
     });        
     

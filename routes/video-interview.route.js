@@ -66,7 +66,7 @@ function getSignedCookies(req, res, next){
                 success : false, 
                 data : err
             })
-        )
+        );
 }
 
 module.exports = router;

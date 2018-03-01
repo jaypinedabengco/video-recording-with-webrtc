@@ -40,14 +40,15 @@
 				// player.initialize(document.querySelector("#videoPlayer"), url, true);
 
 				//set CF cookie first, to be able to view videos
-				recordedVideosDataservice
-					.getCFSignedURLCookies()
-					.then(
-						function(cf_cookies){
-							vm.setSignedCookies(cf_cookies);
-							updateRecordedVideoList();
-						}
-					)
+				updateRecordedVideoList();				
+				// recordedVideosDataservice
+				// 	.getCFSignedURLCookies()
+				// 	.then(
+				// 		function(cf_cookies){
+				// 			vm.setSignedCookies(cf_cookies);
+				// 			updateRecordedVideoList();
+				// 		}
+				// 	);
 			}
 
 			/**
