@@ -45,7 +45,7 @@ function streamVideo(req, res, next){
                 video_stream.stream.pipe(res); //pipe file to response
             }, 
             (err) => res.status(500).json(err)
-        )
+        );
 }
 
 /**
@@ -66,7 +66,7 @@ function getSignedCookies(req, res, next){
                 success : false, 
                 data : err
             })
-        )
+        );
 }
 
 module.exports = router;
