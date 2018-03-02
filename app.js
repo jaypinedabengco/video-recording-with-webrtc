@@ -15,12 +15,16 @@ app.use(cookieParser());
 
 ////
 
+//Custom middlewares
+// Custom Middlewares
+app.use(require('./middlewares/video-interview-authentication.middleware'));
+
 /* Routes */
+
 
 app.use('/', express.static(path.join(__dirname, 'public')));
 app.use('/api', require('./routes/healthcheck.route'));
 app.use('/api', require('./routes/authentication.route'));
-
 
 app.use('/api/video-interview', require('./routes/video-interview.authenticate.route'));
 app.use('/api/video-interview', require('./routes/video-interview.user.route'));

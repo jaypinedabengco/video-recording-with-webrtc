@@ -26,8 +26,8 @@
          * @param {*} data 
          * @param {*} auth_token 
          */
-		function post(api_url, data){
-			return doRequest(api_url, 'POST', data);			
+		function post(api_url, data, auth_token){
+			return doRequest(api_url, 'POST', data, auth_token);			
 		}
 
         /**
@@ -35,8 +35,8 @@
          * @param {*} api_url 
          * @param {*} auth_token 
          */
-		function get(api_url){
-			return doRequest(api_url, 'GET', {});
+		function get(api_url, auth_token){
+			return doRequest(api_url, 'GET', {}, auth_token);
 		}		
 
         /**
@@ -46,12 +46,12 @@
          * @param {*} data 
          * @param {*} auth_token 
          */
-		function doRequest(api_url, method, data){
+		function doRequest(api_url, method, data, auth_token){
 
 			var _method = (method && method.toLowerCase() == 'post')?'POST':'GET';
 
             //build options
-			var _options = {
+			var options = {
 				method : _method, 
 				url : api_url,
 				headers : {
@@ -60,7 +60,11 @@
 				data : data
 			};			
 
-			return $http(_options).then(
+			if ( !!auth_token ){
+				options.headers['x-access-token'] = auth_token;
+			}
+
+			return $http(options).then(
 				function(response){
 					var response_data = response.data;
 					if ( !response_data.success ){

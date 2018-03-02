@@ -12,13 +12,18 @@
 	PersistentStorageManager.$inject = ['localStorageService'];
 	function PersistentStorageManager(localStorageService) {
 
+		var cache = {};
+
 		var services = {
-			set: set,
-			get: get,
-			remove: remove,
+			setStorage: setStorage,
+			getStorage: getStorage,
+			removeStorage: removeStorage,
 			setCookie: setCookie,
 			getCookie: getCookie,
-			removeCookie: removeCookie
+			removeCookie: removeCookie,
+			setVariableCache: setVariableCache,
+			getVariableCache: getVariableCache,
+			removeVariableCache: removeVariableCache
 		};
 
 		return services;
@@ -28,7 +33,7 @@
 		 * @param {*} key 
 		 * @param {*} value 
 		 */
-		function set(key, value) {
+		function setStorage(key, value) {
 			return localStorageService.set(key, value);
 		}
 
@@ -36,7 +41,7 @@
 		 * 
 		 * @param {*} key 
 		 */
-		function get(key) {
+		function getStorage(key) {
 			return localStorageService.get(key);
 		}
 
@@ -44,7 +49,7 @@
 		 * 
 		 * @param {*} key 
 		 */
-		function remove(key) {
+		function removeStorage(key) {
 			return localStorageService.remove(key);
 		}
 
@@ -73,5 +78,33 @@
 		function removeCookie(key) {
 			return localStorageService.cookie.remove(key);
 		}
+
+
+		/**
+		 * 
+		 * @param {*} key 
+		 * @param {*} value 
+		 */
+		function setVariableCache(key, value) { 
+			cache[key] = value;
+			return cache[key];
+		}
+
+		/**
+		 * 
+		 * @param {*} key 
+		 */
+		function getVariableCache(key) { 
+			return cache[key];
+		}
+
+		/**
+		 * 
+		 * @param {*} key 
+		 */
+		function removeVariableCache(key) { 
+			delete cache[key];
+		}
+
 	}
 })();

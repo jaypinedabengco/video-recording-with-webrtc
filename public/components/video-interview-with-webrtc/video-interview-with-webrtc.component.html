@@ -1,4 +1,4 @@
-<div>
+<div ng-if="!$ctrl.processing_is_logged_in">
     <div id="loginPage" class="container text-center" ng-if="!$ctrl.is_logged_in">
             <div class="row">
                 <div class="col-md-4 col-md-offset-4">
@@ -20,7 +20,8 @@
             </div>
         </div>
         <div ng-if="$ctrl.is_logged_in">
-            <h2>YOU ARE LOGGED IN</h2>
+            <h2>Hi {{$ctrl.logged_user_info.username}}</h2>
             <a href="javascript:void(0);" ng-click="$ctrl.logout()">Logout</a>
+            <button ng-click="$ctrl.updateSocketUserInfo()">TEST</button>
         </div>
 </div>

@@ -99,6 +99,10 @@ function getAllUsersUsername(){
  * @param {*} auth_token 
  */
 function decodeAuthToken(auth_token){
+    if ( !auth_token || typeof auth_token != 'string' ){
+        return Promise.reject('auth token is required and must be a string');
+    }
+
     return new Promise((resolve, reject) => {
         jwt.verify(auth_token, config.jwt_secret_key, promiser(resolve, reject));
     });    

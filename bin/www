@@ -136,3 +136,10 @@ function onHttpsListening() {
     : 'port ' + addr.port;
   debug('Listening on ' + bind);
 }
+
+/**
+ * CATCH unhandled errors
+ */
+process.on('unhandledRejection', error => {
+  console.log('[Unhandled Rejection]', error);
+});

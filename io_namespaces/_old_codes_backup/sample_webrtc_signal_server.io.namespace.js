@@ -106,7 +106,7 @@ module.exports = function(namespace_name, io){
                         ongoing_video_recorder = null; //open up for new recorder
                     }, 
                     (err) => console.log("onStopRecording Error", err)
-                )
+                );
         }
         
         /**
@@ -226,20 +226,17 @@ module.exports = function(namespace_name, io){
                                 //send to target
                                 ( target_user ) ? io.to(target_user.socket_id).emit('incoming.onleave', 'disconnected') : '' 
                             }
-                        )  
+                        );  
                 }                    
             }
 
             //end recording
             video_interview_service
                 .stopRecording(ongoing_video_recorder)
-                .then(
-                    () => {
-                        ongoing_video_recorder = null; //open up for new recorder
-                    }, 
-                    (err) => console.log("onStopRecording Error", err)
-                )
-            
+                .then(() => {
+                    ongoing_video_recorder = null; //open up for new recorder
+                })
+                .catch(err => console.log("onStopRecording Error", err));
         }
 
         /**

@@ -151,21 +151,19 @@ function VideoRecorder(data){
         return new Promise((resolve, reject) => {
             public
                 .fileExists()
-                .then(
-                    (exists) => {
-                        if ( !exists ){
-                            return resolve(true) //no need to delete, does not exists
-                        }
-
-                        //delete
-                        fs.unlink(private.file_fullpath, (err) => {
-                            if ( err ){
-                                return reject(err);
-                            }
-                            return resolve();
-                       });
+                .then(exists => {
+                    if ( !exists ){
+                        return resolve(true); //no need to delete, does not exists
                     }
-                );
+
+                    //delete
+                    fs.unlink(private.file_fullpath, (err) => {
+                        if ( err ){
+                            return reject(err);
+                        }
+                        return resolve();
+                    });
+                });
         });        
     }
 
@@ -176,7 +174,7 @@ function VideoRecorder(data){
         return new Promise((resolve, reject) => {
             fs.stat(private.file_fullpath, (err, stat) => {
                 return resolve(!err);
-            })   
+            });
         });            
     }
 
@@ -229,11 +227,11 @@ function VideoRecorder(data){
             const OUTPUT_VIDEO_KEY = [uuidv4(), JOB_CONFIG.outputs.video.key].join('-');
             const OUTPUT_AUDIO_KEY = [uuidv4(), JOB_CONFIG.outputs.audio.key].join('-');
 
-            var PLAYLIST_UNIQUE_PREFIX = uuidv4();
+            const PLAYLIST_UNIQUE_PREFIX = uuidv4();
             const PLAYLIST_NAME = [PLAYLIST_UNIQUE_PREFIX, JOB_CONFIG.playlist.name].join('-');
             const PLAYLIST_NAME_ON_TRANSCODE = [PLAYLIST_UNIQUE_PREFIX, JOB_CONFIG.playlist.name_on_transcode].join('-');
 
-            var transcode_job = {
+            let transcode_job = {
                 PipelineId: config.aws.pipeline_id, /* required */
                 Input: {
                   Key: private.file_s3_file_fullpath // get uploaded file
@@ -368,6 +366,5 @@ function VideoRecorder(data){
     //     });
     // }
 }
-
 
 module.exports = VideoRecorder;
